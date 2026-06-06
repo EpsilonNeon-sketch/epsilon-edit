@@ -4,19 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Epsilon Edits</title>
+    <title>Epsilon Edits Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Compression Library -->
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="icon" href="./icon.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400&display=swap');
 
         body {
             font-family: 'Outfit', sans-serif;
             background-color: #fffbf0;
             color: #1f2937;
         }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
 
         .glass {
             background: rgba(255, 255, 255, 0.85);
@@ -110,13 +116,11 @@
             box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
         }
 
-        .canvas-container {
-            background-color: white;
-            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
-            background-size: 20px 20px;
-            cursor: crosshair;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
 
         #toast-container {
             position: fixed;
@@ -135,11 +139,43 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            min-width: 250px;
         }
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        /* Editor Specific Styles */
+        .markdown-preview h1 { font-size: 2em; font-weight: bold; margin-bottom: 0.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+        .markdown-preview h2 { font-size: 1.5em; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; }
+        .markdown-preview p { margin-bottom: 1em; line-height: 1.6; }
+        .markdown-preview ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
+        .markdown-preview blockquote { border-left: 4px solid #fbbf24; padding-left: 1em; color: #666; font-style: italic; }
+        .markdown-preview pre { background: #1f2937; color: #f3f4f6; padding: 1em; border-radius: 0.5em; overflow-x: auto; margin-bottom: 1em; }
+        .markdown-preview code { background: #eee; padding: 0.2em 0.4em; border-radius: 0.2em; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
+        .markdown-preview pre code { background: transparent; padding: 0; }
+
+        .spreadsheet-cell {
+            min-width: 100px;
+            height: 32px;
+            border: 1px solid #e5e7eb;
+            padding: 0 8px;
+            outline: none;
+            background: white;
+        }
+        .spreadsheet-cell:focus { background: #fffbeb; border: 2px solid #f59e0b; }
+        .spreadsheet-header { background: #f9fafb; text-align: center; font-weight: 600; color: #6b7280; }
+
+        .slide-stage {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: white;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            position: relative;
+        }
+        .slide-content { outline: none; height: 100%; padding: 2rem; overflow-y: auto; }
 
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
@@ -164,24 +200,21 @@
     <aside id="sidebar" class="sidebar closed">
         <div class="p-6">
             <div class="flex items-center justify-between mb-8">
-                <h2 class="text-2xl font-bold text-gray-800">EPSILON<span class="text-amber-500"> EDITS</span></h2>
+                <h2 class="text-xl font-bold text-gray-800">EPSILON<span class="text-amber-500"> EDITS</span></h2>
                 <button id="closeSidebar" class="md:hidden text-gray-500 hover:text-gray-800">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
             </div>
 
-            <nav class="space-y-2">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-3">Studio</p>
+            <nav class="space-y-1 mb-6">
                 <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 hover:text-amber-700 transition text-left text-gray-600" data-page="dashboard">
                     <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                     <span>Dashboard</span>
                 </button>
                 <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 hover:text-amber-700 transition text-left text-gray-600" data-page="studio">
                     <i data-lucide="palette" class="w-5 h-5"></i>
-                    <span>Studio (Draw)</span>
-                </button>
-                <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 hover:text-amber-700 transition text-left text-gray-600" data-page="projects">
-                    <i data-lucide="layers" class="w-5 h-5"></i>
-                    <span>Projects</span>
+                    <span>Draw</span>
                 </button>
                 <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 hover:text-amber-700 transition text-left text-gray-600" data-page="gallery">
                     <i data-lucide="images" class="w-5 h-5"></i>
@@ -189,7 +222,31 @@
                 </button>
             </nav>
 
-            <div class="mt-8 pt-8 border-t border-gray-200">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-3">Workspace</p>
+            <nav class="space-y-1 mb-6">
+                <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 hover:text-amber-700 transition text-left text-gray-600" data-page="documents">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    <span>Docs (Markdown)</span>
+                </button>
+                <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 hover:text-amber-700 transition text-left text-gray-600" data-page="spreadsheets">
+                    <i data-lucide="table" class="w-5 h-5"></i>
+                    <span>Sheets</span>
+                </button>
+                <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 hover:text-amber-700 transition text-left text-gray-600" data-page="slides">
+                    <i data-lucide="monitor" class="w-5 h-5"></i>
+                    <span>Slides</span>
+                </button>
+            </nav>
+
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-3">Management</p>
+            <nav class="space-y-1 mb-8">
+                <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 hover:text-amber-700 transition text-left text-gray-600" data-page="projects">
+                    <i data-lucide="layers" class="w-5 h-5"></i>
+                    <span>Projects</span>
+                </button>
+            </nav>
+
+            <div class="border-t border-gray-200 pt-4">
                 <button id="logoutBtn" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 hover:text-red-600 transition text-left text-gray-600">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                     <span>Logout</span>
@@ -198,6 +255,7 @@
         </div>
     </aside>
 
+    <!-- Auth Page -->
     <div id="authPage" class="page active px-6">
         <div class="max-w-md w-full">
             <div class="glass p-8 rounded-2xl border-t-4 border-amber-400">
@@ -223,6 +281,7 @@
         </div>
     </div>
 
+    <!-- Main App Container -->
     <div id="dashboardPage" class="page">
         <div id="mainContent" class="main-content expanded">
             <header class="flex justify-between items-center mb-8">
@@ -233,10 +292,11 @@
                 <div id="userAvatar" class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-xl border-2 border-white shadow-sm"></div>
             </header>
 
+            <!-- Dashboard Home -->
             <div id="dashboardSection" class="section">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="glass p-6 rounded-2xl flex items-center justify-between">
-                        <div><p class="text-gray-500 text-sm font-medium">Active Projects</p><h3 id="statProjects" class="text-3xl font-bold text-gray-800 mt-1">0</h3></div>
+                        <div><p class="text-gray-500 text-sm font-medium">Projects</p><h3 id="statProjects" class="text-3xl font-bold text-gray-800 mt-1">0</h3></div>
                         <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600"><i data-lucide="folder" class="w-6 h-6"></i></div>
                     </div>
                     <div class="glass p-6 rounded-2xl flex items-center justify-between">
@@ -244,8 +304,8 @@
                         <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600"><i data-lucide="image" class="w-6 h-6"></i></div>
                     </div>
                     <div class="glass p-6 rounded-2xl flex items-center justify-between">
-                        <div><p class="text-gray-500 text-sm font-medium">Completed</p><h3 id="statCompleted" class="text-3xl font-bold text-gray-800 mt-1">0</h3></div>
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600"><i data-lucide="check-circle" class="w-6 h-6"></i></div>
+                        <div><p class="text-gray-500 text-sm font-medium">Workspace Files</p><h3 id="statWorkspace" class="text-3xl font-bold text-gray-800 mt-1">0</h3></div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"><i data-lucide="hard-drive" class="w-6 h-6"></i></div>
                     </div>
                 </div>
                 
@@ -253,9 +313,13 @@
                     <div class="glass p-6 rounded-2xl">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
                         <div class="grid grid-cols-2 gap-4">
-                            <button onclick="navTo('studio')" class="flex flex-col items-center justify-center p-4 bg-amber-50 rounded-xl hover:bg-amber-100 transition gap-2">
-                                <i data-lucide="paintbrush" class="w-8 h-8 text-amber-600"></i>
-                                <span class="font-medium text-amber-800">New Drawing</span>
+                            <button onclick="navTo('documents')" class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition gap-2">
+                                <i data-lucide="file-plus" class="w-8 h-8 text-gray-600"></i>
+                                <span class="font-medium text-gray-800">New Doc</span>
+                            </button>
+                            <button onclick="navTo('spreadsheets')" class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition gap-2">
+                                <i data-lucide="spreadsheet" class="w-8 h-8 text-green-600"></i>
+                                <span class="font-medium text-gray-800">New Sheet</span>
                             </button>
                         </div>
                     </div>
@@ -266,6 +330,7 @@
                 </div>
             </div>
 
+            <!-- Drawing Studio (Existing) -->
             <div id="studioSection" class="section hidden">
                 <div class="glass p-1 rounded-2xl flex flex-col h-[80vh]">
                     <div class="bg-white p-3 rounded-t-xl flex flex-wrap items-center justify-between gap-4 border-b border-gray-100">
@@ -287,7 +352,6 @@
                              <button onclick="saveDrawingToGallery()" class="bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
                                 <i data-lucide="save" class="w-4 h-4"></i> Save
                              </button>
-                             <a id="downloadLink" class="hidden"></a>
                         </div>
                     </div>
                     <div class="flex-1 bg-gray-50 relative overflow-hidden canvas-container" id="canvasWrapper">
@@ -296,6 +360,7 @@
                 </div>
             </div>
 
+            <!-- Projects Section (Existing) -->
             <div id="projectsSection" class="section hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div class="lg:col-span-1">
@@ -325,6 +390,7 @@
                 </div>
             </div>
 
+            <!-- Gallery Section (Existing) -->
             <div id="gallerySection" class="section hidden">
                  <div class="glass p-6 rounded-2xl min-h-[80vh]">
                     <div class="flex justify-between items-center mb-6">
@@ -335,10 +401,137 @@
                  </div>
             </div>
 
+            <!-- ================= NEW SECTIONS ================= -->
+
+            <!-- DOCUMENTS (MARKDOWN) -->
+            <div id="documentsSection" class="section hidden">
+                <!-- List View -->
+                <div id="docsListView">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">My Documents</h2>
+                        <button onclick="createNewDoc()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 transition">
+                            <i data-lucide="plus" class="w-4 h-4"></i> New Document
+                        </button>
+                    </div>
+                    <div class="glass p-6 rounded-2xl min-h-[400px]">
+                        <div id="docsList" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <!-- Editor View -->
+                <div id="docsEditorView" class="hidden h-[calc(100vh-140px)] flex flex-col gap-4">
+                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                        <input type="text" id="docTitleInput" class="text-xl font-bold bg-transparent border-none outline-none text-gray-800 w-1/3" placeholder="Untitled Document">
+                        <div class="flex gap-2">
+                            <button onclick="closeDocEditor()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">Back</button>
+                            <button onclick="saveDoc()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex-1 grid grid-cols-2 gap-6 h-full">
+                        <div class="glass rounded-xl overflow-hidden flex flex-col">
+                            <div class="bg-gray-50 p-2 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase">Markdown</div>
+                            <textarea id="mdInput" class="flex-1 w-full p-4 resize-none outline-none font-mono text-sm bg-white" placeholder="Write markdown here..."></textarea>
+                        </div>
+                        <div class="glass rounded-xl overflow-hidden flex flex-col">
+                            <div class="bg-gray-50 p-2 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase">Preview</div>
+                            <div id="mdPreview" class="flex-1 p-6 overflow-y-auto markdown-preview bg-white"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPREADSHEETS -->
+            <div id="spreadsheetsSection" class="section hidden">
+                <!-- List View -->
+                <div id="sheetsListView">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">My Spreadsheets</h2>
+                        <button onclick="createNewSheet()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 transition">
+                            <i data-lucide="plus" class="w-4 h-4"></i> New Sheet
+                        </button>
+                    </div>
+                    <div class="glass p-6 rounded-2xl min-h-[400px]">
+                        <div id="sheetsList" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <!-- Editor View -->
+                <div id="sheetsEditorView" class="hidden h-[calc(100vh-140px)] flex flex-col gap-4">
+                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                        <input type="text" id="sheetTitleInput" class="text-xl font-bold bg-transparent border-none outline-none text-gray-800 w-1/3" placeholder="Untitled Sheet">
+                        <div class="flex gap-2">
+                            <button onclick="closeSheetEditor()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">Back</button>
+                            <button onclick="saveSheet()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl overflow-auto flex-1 relative shadow-inner bg-gray-100">
+                        <table id="sheetGrid" class="border-collapse bg-white w-full"></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDES -->
+            <div id="slidesSection" class="section hidden">
+                <!-- List View -->
+                <div id="slidesListView">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">My Presentations</h2>
+                        <button onclick="createNewDeck()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 transition">
+                            <i data-lucide="plus" class="w-4 h-4"></i> New Deck
+                        </button>
+                    </div>
+                    <div class="glass p-6 rounded-2xl min-h-[400px]">
+                        <div id="slidesList" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <!-- Editor View -->
+                <div id="slidesEditorView" class="hidden h-[calc(100vh-140px)] flex flex-col gap-4">
+                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                        <input type="text" id="deckTitleInput" class="text-xl font-bold bg-transparent border-none outline-none text-gray-800 w-1/3" placeholder="Untitled Presentation">
+                        <div class="flex gap-2">
+                            <button onclick="closeSlidesEditor()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">Back</button>
+                            <button onclick="addSlide()" class="text-gray-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition flex items-center gap-1" title="Add Slide"><i data-lucide="plus-square" class="w-5 h-5"></i></button>
+                            <button onclick="deleteCurrentSlide()" class="text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg transition" title="Delete Slide"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                            <button onclick="saveDeck()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 flex gap-4">
+                        <!-- Slide Thumbnails -->
+                        <div class="w-48 flex flex-col gap-3 overflow-y-auto pr-2 pb-2">
+                            <div id="slideThumbnails" class="space-y-3"></div>
+                        </div>
+
+                        <!-- Main Stage -->
+                        <div class="flex-1 flex flex-col gap-4">
+                            <div class="flex-1 flex items-center justify-center bg-gray-200 rounded-xl p-8 overflow-hidden">
+                                <div id="currentSlideDisplay" class="slide-stage bg-white text-gray-800 flex flex-col">
+                                    <div id="currentSlideEditor" class="slide-content text-lg" contenteditable="true"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-center gap-4">
+                                <button onclick="prevSlide()" class="p-2 bg-white rounded-full shadow hover:bg-gray-50"><i data-lucide="chevron-left" class="w-6 h-6"></i></button>
+                                <span id="slideCounter" class="text-sm font-bold text-gray-500 self-center">1 / 1</span>
+                                <button onclick="nextSlide()" class="p-2 bg-white rounded-full shadow hover:bg-gray-50"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
+        // --- Initialization ---
         const { createClient } = supabase;
         const supabaseClient = createClient('https://gfsqzkyviivhvyqadpeg.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdmc3F6a3l2aWl2aHZ5cWFkcGVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NDI0NDQsImV4cCI6MjA4NjAxODQ0NH0.MwC6dMZKFZMyklCJKqr4DPek8dxR-EswBZSd1L_AkMA', {
             auth: { persistSession: true, storageKey: 'epsilon-edits-auth' }
@@ -347,6 +540,7 @@
         let currentUser = null;
         let projectsFilter = 'all';
 
+        // UI Helpers
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
         const menuToggle = document.getElementById('menuToggle');
@@ -367,16 +561,13 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'toast';
-            
             let icon = 'info';
             let color = 'text-blue-500';
             if(type === 'success') { icon = 'check-circle'; color = 'text-green-500'; }
             if(type === 'error') { icon = 'alert-circle'; color = 'text-red-500'; }
-
             toast.innerHTML = `<i data-lucide="${icon}" class="${color}"></i> <span class="text-sm font-medium text-gray-700">${message}</span>`;
             container.appendChild(toast);
             lucide.createIcons();
-
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateX(100%)';
@@ -384,6 +575,7 @@
             }, 3000);
         }
 
+        // Navigation
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const page = btn.dataset.page;
@@ -398,6 +590,9 @@
                 if (page === 'projects') loadProjects();
                 if (page === 'gallery') loadGallery();
                 if (page === 'studio') initCanvas();
+                if (page === 'documents') loadDocs();
+                if (page === 'spreadsheets') loadSheets();
+                if (page === 'slides') loadDecks();
             });
         });
 
@@ -405,6 +600,7 @@
             document.querySelector(`[data-page="${pageName}"]`).click();
         }
 
+        // --- Canvas (Studio) Logic ---
         const canvas = document.getElementById('drawingCanvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
@@ -435,7 +631,6 @@
             if (!isDrawing) return;
             const x = e.clientX - canvas.getBoundingClientRect().left;
             const y = e.clientY - canvas.getBoundingClientRect().top;
-            
             ctx.lineWidth = document.getElementById('brushSize').value;
             if (currentTool === 'eraser') {
                 ctx.globalCompositeOperation = 'destination-out';
@@ -443,7 +638,6 @@
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.strokeStyle = document.getElementById('drawColor').value;
             }
-            
             ctx.lineTo(x, y);
             ctx.stroke();
         }
@@ -454,33 +648,20 @@
             document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tool${tool.charAt(0).toUpperCase() + tool.slice(1)}`).classList.add('active');
         }
-        
-        document.getElementById('brushSize').addEventListener('input', (e) => {
-            document.getElementById('brushSizeVal').innerText = e.target.value;
-        });
+        document.getElementById('brushSize').addEventListener('input', (e) => { document.getElementById('brushSizeVal').innerText = e.target.value; });
 
         async function saveDrawingToGallery() {
             const dataURL = canvas.toDataURL('image/png');
             const title = prompt("Name your masterpiece:", "Untitled Art");
             if(!title) return;
-
             const { error } = await supabaseClient.from('art_gallery').insert([{
-                user_id: currentUser.id,
-                title: title,
-                image_data: dataURL
+                user_id: currentUser.id, title: title, image_data: dataURL
             }]);
-
-            if(error) {
-                showToast("Error saving: " + error.message, 'error');
-            } else {
-                showToast("Art saved to Gallery!", 'success');
-                const link = document.createElement('a');
-                link.download = `${title}.png`;
-                link.href = dataURL;
-                link.click();
-            }
+            if(error) showToast("Error saving: " + error.message, 'error');
+            else { showToast("Art saved to Gallery!", 'success'); const link = document.createElement('a'); link.download = `${title}.png`; link.href = dataURL; link.click(); }
         }
 
+        // --- Auth Logic ---
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) { currentUser = session.user; setupUserInterface(); } else { showAuthPage(); }
@@ -507,35 +688,25 @@
         });
         document.getElementById('logoutBtn').addEventListener('click', async () => { await supabaseClient.auth.signOut(); currentUser = null; window.location.reload(); });
 
+        // --- Dashboard & Projects & Gallery (Existing) ---
         async function loadDashboardData() {
             const { count: projCount } = await supabaseClient.from('art_projects').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
             const { count: artCount } = await supabaseClient.from('art_gallery').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
-            const { count: doneCount } = await supabaseClient.from('art_projects').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id).eq('status', 'completed');
+            const { count: wsCount } = await supabaseClient.from('epsilon_docs').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id); // Docs count proxy for workspace
             
             document.getElementById('statProjects').textContent = projCount || 0;
             document.getElementById('statArt').textContent = artCount || 0;
-            document.getElementById('statCompleted').textContent = doneCount || 0;
+            document.getElementById('statWorkspace').textContent = wsCount || 0;
 
             const { data: recent } = await supabaseClient.from('art_projects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(3);
             const recContainer = document.getElementById('dashboardRecentProjects');
             recContainer.innerHTML = '';
             if(recent && recent.length > 0) {
                 recent.forEach(p => {
-                    recContainer.innerHTML += `
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600"><i data-lucide="folder" class="w-4 h-4"></i></div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-gray-800">${p.title}</h4>
-                                    <p class="text-xs text-gray-500">${p.status}</p>
-                                </div>
-                            </div>
-                        </div>`;
+                    recContainer.innerHTML += `<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600"><i data-lucide="folder" class="w-4 h-4"></i></div><div><h4 class="text-sm font-bold text-gray-800">${p.title}</h4><p class="text-xs text-gray-500">${p.status}</p></div></div></div>`;
                 });
                 lucide.createIcons();
-            } else {
-                recContainer.innerHTML = '<p class="text-sm text-gray-400">No recent projects.</p>';
-            }
+            } else { recContainer.innerHTML = '<p class="text-sm text-gray-400">No recent projects.</p>'; }
         }
 
         document.getElementById('projectForm').addEventListener('submit', async (e) => {
@@ -555,27 +726,16 @@
             if (projectsFilter === 'active') query = query.eq('status', 'pending');
             if (projectsFilter === 'done') query = query.eq('status', 'completed');
             const { data: projects } = await query; 
-            
             const container = document.getElementById('projectsList'); container.innerHTML = '';
             if (!projects || projects.length === 0) { container.innerHTML = `<div class="text-center py-10 text-gray-400"><p>No projects found.</p></div>`; return; }
-            
             projects.forEach(proj => {
                 const div = document.createElement('div');
                 div.className = `p-4 rounded-xl border transition-all ${proj.status === 'completed' ? 'bg-gray-50 border-gray-200' : 'bg-white border-amber-100 shadow-sm'}`;
-                div.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <button onclick="toggleProjStatus(${proj.id}, '${proj.status}')" class="mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${proj.status === 'completed' ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-amber-500'}">${proj.status === 'completed' ? '<i data-lucide="check" class="w-3 h-3 text-white"></i>' : ''}</button>
-                        <div class="flex-1"><h3 class="${proj.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-800 font-medium'}">${proj.title}</h3>${proj.description ? `<p class="text-sm text-gray-500 mt-1">${proj.description}</p>` : ''}${proj.due_date ? `<div class="flex items-center gap-1 mt-2 text-xs text-gray-400"><i data-lucide="calendar" class="w-3 h-3"></i> ${proj.due_date}</div>` : ''}</div>
-                        <button onclick="deleteProj(${proj.id})" class="text-gray-300 hover:text-red-500 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>`;
+                div.innerHTML = `<div class="flex items-start gap-3"><button onclick="toggleProjStatus(${proj.id}, '${proj.status}')" class="mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${proj.status === 'completed' ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-amber-500'}">${proj.status === 'completed' ? '<i data-lucide="check" class="w-3 h-3 text-white"></i>' : ''}</button><div class="flex-1"><h3 class="${proj.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-800 font-medium'}">${proj.title}</h3>${proj.description ? `<p class="text-sm text-gray-500 mt-1">${proj.description}</p>` : ''}${proj.due_date ? `<div class="flex items-center gap-1 mt-2 text-xs text-gray-400"><i data-lucide="calendar" class="w-3 h-3"></i> ${proj.due_date}</div>` : ''}</div><button onclick="deleteProj(${proj.id})" class="text-gray-300 hover:text-red-500 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
                 container.appendChild(div);
             }); lucide.createIcons();
         }
-        async function toggleProjStatus(id, status) { 
-            const newStatus = status === 'pending' ? 'completed' : 'pending';
-            await supabaseClient.from('art_projects').update({ status: newStatus }).eq('id', id); 
-            loadProjects(); 
-        }
+        async function toggleProjStatus(id, status) { const newStatus = status === 'pending' ? 'completed' : 'pending'; await supabaseClient.from('art_projects').update({ status: newStatus }).eq('id', id); loadProjects(); }
         async function deleteProj(id) { if(confirm('Delete this project?')) { await supabaseClient.from('art_projects').delete().eq('id', id); loadProjects(); } }
         const filterBtnsProj = { 'filterAllProj': 'all', 'filterActiveProj': 'active', 'filterDoneProj': 'done' };
         Object.keys(filterBtnsProj).forEach(btnId => {
@@ -589,24 +749,309 @@
             const { data: gallery } = await supabaseClient.from('art_gallery').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
             const container = document.getElementById('galleryGrid'); container.innerHTML = '';
             if (!gallery || gallery.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400"><p>Gallery is empty. Go draw something!</p></div>`; return; }
-            
             gallery.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'bg-white p-3 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition group';
-                div.innerHTML = `
-                    <div class="aspect-square bg-gray-50 rounded-lg overflow-hidden mb-3 flex items-center justify-center">
-                        <img src="${item.image_data}" class="w-full h-full object-contain">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <h4 class="font-bold text-gray-800 text-sm truncate">${item.title}</h4>
-                        <button onclick="deleteArt(${item.id})" class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><i data-lucide="trash" class="w-4 h-4"></i></button>
-                    </div>
-                `;
+                div.innerHTML = `<div class="aspect-square bg-gray-50 rounded-lg overflow-hidden mb-3 flex items-center justify-center"><img src="${item.image_data}" class="w-full h-full object-contain"></div><div class="flex justify-between items-center"><h4 class="font-bold text-gray-800 text-sm truncate">${item.title}</h4><button onclick="deleteArt(${item.id})" class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><i data-lucide="trash" class="w-4 h-4"></i></button></div>`;
                 container.appendChild(div);
             });
             lucide.createIcons();
         }
         async function deleteArt(id) { if(confirm('Delete this artwork?')) { await supabaseClient.from('art_gallery').delete().eq('id', id); loadGallery(); } }
+
+        // ================= NEW WORKSPACE LOGIC =================
+
+        // --- 1. DOCUMENTS (MARKDOWN) ---
+        let currentDocId = null;
+
+        async function loadDocs() {
+            const { data } = await supabaseClient.from('epsilon_docs').select('*').eq('user_id', currentUser.id).order('updated_at', { ascending: false });
+            const container = document.getElementById('docsList');
+            container.innerHTML = '';
+            if(!data || data.length === 0) { container.innerHTML = '<p class="text-gray-400 text-center py-4">No documents found.</p>'; return; }
+            
+            data.forEach(doc => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center p-4 bg-white border border-gray-100 rounded-lg hover:bg-amber-50 cursor-pointer transition';
+                div.innerHTML = `<div class="flex items-center gap-3"><i data-lucide="file-text" class="text-amber-500"></i><div><h4 class="font-bold text-gray-800">${doc.title}</h4><p class="text-xs text-gray-400">Last updated: ${new Date(doc.updated_at).toLocaleDateString()}</p></div></div><button class="delete-doc-btn text-gray-300 hover:text-red-500 p-2" data-id="${doc.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                div.querySelector('.delete-doc-btn').addEventListener('click', (e) => { e.stopPropagation(); deleteDoc(doc.id); });
+                div.addEventListener('click', () => openDocEditor(doc));
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function createNewDoc() { openDocEditor({ id: null, title: '', content: '' }); }
+        
+        async function openDocEditor(doc) {
+            currentDocId = doc.id;
+            document.getElementById('docsListView').classList.add('hidden');
+            document.getElementById('docsEditorView').classList.remove('hidden');
+            document.getElementById('docTitleInput').value = doc.title || 'Untitled Document';
+            
+            // Decompress Content
+            const mdContent = doc.content ? LZString.decompressFromUTF16(doc.content) : '# Start writing...';
+            document.getElementById('mdInput').value = mdContent;
+            updateMarkdownPreview();
+        }
+
+        function closeDocEditor() {
+            document.getElementById('docsEditorView').classList.add('hidden');
+            document.getElementById('docsListView').classList.remove('hidden');
+            loadDocs();
+        }
+
+        document.getElementById('mdInput').addEventListener('input', updateMarkdownPreview);
+        function updateMarkdownPreview() {
+            const raw = document.getElementById('mdInput').value;
+            document.getElementById('mdPreview').innerHTML = marked.parse(raw);
+        }
+
+        async function saveDoc() {
+            const title = document.getElementById('docTitleInput').value;
+            const content = document.getElementById('mdInput').value;
+            // Compress
+            const compressedContent = LZString.compressToUTF16(content);
+
+            if(currentDocId) {
+                await supabaseClient.from('epsilon_docs').update({ title, content: compressedContent }).eq('id', currentDocId);
+            } else {
+                const { data } = await supabaseClient.from('epsilon_docs').insert([{ user_id: currentUser.id, title, content: compressedContent }]).select();
+                currentDocId = data[0].id;
+            }
+            showToast('Document saved!', 'success');
+        }
+
+        async function deleteDoc(id) {
+            if(confirm('Delete this document?')) {
+                await supabaseClient.from('epsilon_docs').delete().eq('id', id);
+                loadDocs();
+            }
+        }
+
+        // --- 2. SPREADSHEETS ---
+        let currentSheetId = null;
+        const COLS = 26; 
+        const ROWS = 50;
+        let sheetData = {}; // Object key="row-col", value="content"
+
+        async function loadSheets() {
+            const { data } = await supabaseClient.from('epsilon_sheets').select('*').eq('user_id', currentUser.id).order('updated_at', { ascending: false });
+            const container = document.getElementById('sheetsList');
+            container.innerHTML = '';
+            if(!data || data.length === 0) { container.innerHTML = '<p class="text-gray-400 text-center py-4">No spreadsheets found.</p>'; return; }
+            
+            data.forEach(sheet => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center p-4 bg-white border border-gray-100 rounded-lg hover:bg-amber-50 cursor-pointer transition';
+                div.innerHTML = `<div class="flex items-center gap-3"><i data-lucide="table" class="text-green-500"></i><div><h4 class="font-bold text-gray-800">${sheet.title}</h4><p class="text-xs text-gray-400">Last updated: ${new Date(sheet.updated_at).toLocaleDateString()}</p></div></div><button class="delete-sheet-btn text-gray-300 hover:text-red-500 p-2" data-id="${sheet.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                div.querySelector('.delete-sheet-btn').addEventListener('click', (e) => { e.stopPropagation(); deleteSheet(sheet.id); });
+                div.addEventListener('click', () => openSheetEditor(sheet));
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function createNewSheet() { openSheetEditor({ id: null, title: '', content: '' }); }
+
+        function openSheetEditor(sheet) {
+            currentSheetId = sheet.id;
+            document.getElementById('sheetsListView').classList.add('hidden');
+            document.getElementById('sheetsEditorView').classList.remove('hidden');
+            document.getElementById('sheetTitleInput').value = sheet.title || 'Untitled Sheet';
+            
+            // Initialize or Load Data
+            if(sheet.content) {
+                sheetData = JSON.parse(LZString.decompressFromUTF16(sheet.content));
+            } else {
+                sheetData = {};
+            }
+            renderGrid();
+        }
+
+        function closeSheetEditor() {
+            document.getElementById('sheetsEditorView').classList.add('hidden');
+            document.getElementById('sheetsListView').classList.remove('hidden');
+            loadSheets();
+        }
+
+        function renderGrid() {
+            const table = document.getElementById('sheetGrid');
+            table.innerHTML = '';
+            
+            // Header Row
+            const thead = document.createElement('thead');
+            const trHead = document.createElement('tr');
+            trHead.innerHTML = '<th class="spreadsheet-cell border border-gray-300 bg-gray-50"></th>'; // Corner
+            for(let c=0; c<COLS; c++) {
+                const colLabel = String.fromCharCode(65 + c);
+                trHead.innerHTML += `<th class="spreadsheet-cell spreadsheet-header">${colLabel}</th>`;
+            }
+            thead.appendChild(trHead);
+            table.appendChild(thead);
+
+            // Body
+            const tbody = document.createElement('tbody');
+            for(let r=0; r<ROWS; r++) {
+                const tr = document.createElement('tr');
+                // Row Number
+                tr.innerHTML = `<td class="spreadsheet-cell spreadsheet-header">${r+1}</td>`;
+                
+                for(let c=0; c<COLS; c++) {
+                    const cellKey = `${r}-${c}`;
+                    const val = sheetData[cellKey] || '';
+                    const td = document.createElement('td');
+                    td.className = 'spreadsheet-cell';
+                    td.contentEditable = true;
+                    td.innerText = val;
+                    td.dataset.key = cellKey;
+                    
+                    td.addEventListener('input', (e) => {
+                        sheetData[cellKey] = e.target.innerText;
+                    });
+                    // Simple tab navigation support could be added here
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            }
+            table.appendChild(tbody);
+        }
+
+        async function saveSheet() {
+            const title = document.getElementById('sheetTitleInput').value;
+            const compressedContent = LZString.compressToUTF16(JSON.stringify(sheetData));
+            
+            if(currentSheetId) {
+                await supabaseClient.from('epsilon_sheets').update({ title, content: compressedContent }).eq('id', currentSheetId);
+            } else {
+                const { data } = await supabaseClient.from('epsilon_sheets').insert([{ user_id: currentUser.id, title, content: compressedContent }]).select();
+                currentSheetId = data[0].id;
+            }
+            showToast('Spreadsheet saved!', 'success');
+        }
+
+        async function deleteSheet(id) {
+            if(confirm('Delete this spreadsheet?')) {
+                await supabaseClient.from('epsilon_sheets').delete().eq('id', id);
+                loadSheets();
+            }
+        }
+
+        // --- 3. SLIDES ---
+        let currentDeckId = null;
+        let slides = []; // Array of objects { id, html }
+        let currentSlideIndex = 0;
+
+        async function loadDecks() {
+            const { data } = await supabaseClient.from('epsilon_slides').select('*').eq('user_id', currentUser.id).order('updated_at', { ascending: false });
+            const container = document.getElementById('slidesList');
+            container.innerHTML = '';
+            if(!data || data.length === 0) { container.innerHTML = '<p class="text-gray-400 text-center py-4">No presentations found.</p>'; return; }
+            
+            data.forEach(deck => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center p-4 bg-white border border-gray-100 rounded-lg hover:bg-amber-50 cursor-pointer transition';
+                div.innerHTML = `<div class="flex items-center gap-3"><i data-lucide="monitor" class="text-blue-500"></i><div><h4 class="font-bold text-gray-800">${deck.title}</h4><p class="text-xs text-gray-400">Last updated: ${new Date(deck.updated_at).toLocaleDateString()}</p></div></div><button class="delete-deck-btn text-gray-300 hover:text-red-500 p-2" data-id="${deck.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                div.querySelector('.delete-deck-btn').addEventListener('click', (e) => { e.stopPropagation(); deleteDeck(deck.id); });
+                div.addEventListener('click', () => openSlidesEditor(deck));
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function createNewDeck() { openSlidesEditor({ id: null, title: '', content: '' }); }
+
+        function openSlidesEditor(deck) {
+            currentDeckId = deck.id;
+            document.getElementById('slidesListView').classList.add('hidden');
+            document.getElementById('slidesEditorView').classList.remove('hidden');
+            document.getElementById('deckTitleInput').value = deck.title || 'Untitled Presentation';
+            
+            if(deck.content) {
+                slides = JSON.parse(LZString.decompressFromUTF16(deck.content));
+            } else {
+                slides = [{ id: Date.now(), html: '<h1 class="text-4xl font-bold mb-4">Title Slide</h1><p class="text-xl">Click to edit text</p>' }];
+            }
+            currentSlideIndex = 0;
+            renderSlideEditor();
+        }
+
+        function closeSlidesEditor() {
+            document.getElementById('slidesEditorView').classList.add('hidden');
+            document.getElementById('slidesListView').classList.remove('hidden');
+            loadDecks();
+        }
+
+        function renderSlideEditor() {
+            // Render current slide
+            const slide = slides[currentSlideIndex];
+            document.getElementById('currentSlideEditor').innerHTML = slide.html;
+            
+            // Render thumbnails
+            const thumbContainer = document.getElementById('slideThumbnails');
+            thumbContainer.innerHTML = '';
+            slides.forEach((s, idx) => {
+                const div = document.createElement('div');
+                const isActive = idx === currentSlideIndex;
+                div.className = `aspect-video bg-white border-2 rounded p-2 cursor-pointer transition ${isActive ? 'border-amber-500 shadow-md' : 'border-transparent hover:border-gray-300'}`;
+                // Scale down preview
+                div.innerHTML = `<div class="w-full h-full bg-white transform scale-[0.2] origin-top-left pointer-events-none overflow-hidden" style="width: 500%; height: 500%;">${s.html}</div>`;
+                div.addEventListener('click', () => { currentSlideIndex = idx; renderSlideEditor(); });
+                thumbContainer.appendChild(div);
+            });
+
+            // Update counter
+            document.getElementById('slideCounter').innerText = `${currentSlideIndex + 1} / ${slides.length}`;
+
+            // Sync editing
+            const editor = document.getElementById('currentSlideEditor');
+            editor.addEventListener('input', () => {
+                slides[currentSlideIndex].html = editor.innerHTML;
+                // Debounce thumbnail update if needed, for now simple
+            });
+        }
+
+        function addSlide() {
+            slides.splice(currentSlideIndex + 1, 0, { id: Date.now(), html: '<h2 class="text-2xl font-bold">New Slide</h2><ul><li>Point 1</li><li>Point 2</li></ul>' });
+            currentSlideIndex++;
+            renderSlideEditor();
+        }
+
+        function deleteCurrentSlide() {
+            if(slides.length <= 1) { showToast('Cannot delete the last slide', 'error'); return; }
+            if(confirm('Delete this slide?')) {
+                slides.splice(currentSlideIndex, 1);
+                if(currentSlideIndex >= slides.length) currentSlideIndex--;
+                renderSlideEditor();
+            }
+        }
+
+        function nextSlide() {
+            if(currentSlideIndex < slides.length - 1) { currentSlideIndex++; renderSlideEditor(); }
+        }
+        function prevSlide() {
+            if(currentSlideIndex > 0) { currentSlideIndex--; renderSlideEditor(); }
+        }
+
+        async function saveDeck() {
+            const title = document.getElementById('deckTitleInput').value;
+            const compressedContent = LZString.compressToUTF16(JSON.stringify(slides));
+            
+            if(currentDeckId) {
+                await supabaseClient.from('epsilon_slides').update({ title, content: compressedContent }).eq('id', currentDeckId);
+            } else {
+                const { data } = await supabaseClient.from('epsilon_slides').insert([{ user_id: currentUser.id, title, content: compressedContent }]).select();
+                currentDeckId = data[0].id;
+            }
+            showToast('Presentation saved!', 'success');
+        }
+
+        async function deleteDeck(id) {
+            if(confirm('Delete this presentation?')) {
+                await supabaseClient.from('epsilon_slides').delete().eq('id', id);
+                loadDecks();
+            }
+        }
 
         checkSession();
     </script>
