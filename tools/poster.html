@@ -1,0 +1,3933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Epsilon Edits · Poster Designer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@300;400;700;900&family=Poppins:wght@300;400;600;700;900&family=Bebas+Neue&family=Pacifico&family=Lobster&family=Caveat:wght@400;700&family=Anton&family=Oswald:wght@400;700&family=DM+Serif+Display&family=Space+Grotesk:wght@400;700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          epsilon: {
+            50:  '#FFFDF2',
+            100: '#FFF9D9',
+            200: '#FFF2A8',
+            300: '#FFE970',
+            400: '#FFDD3A',
+            500: '#F5C518',
+            600: '#D9A90E',
+            700: '#A87E08',
+            800: '#6B5105',
+            900: '#3D2F03',
+          },
+          ink: {
+            50:  '#F8F8F7',
+            100: '#EDEDEA',
+            200: '#D6D6D0',
+            300: '#B4B4AB',
+            400: '#8C8C81',
+            500: '#66665D',
+            600: '#4A4A43',
+            700: '#33332E',
+            800: '#1F1F1C',
+            900: '#0E0E0C',
+          }
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+        },
+        boxShadow: {
+          'soft': '0 2px 12px -2px rgba(0,0,0,0.08)',
+          'panel': '0 8px 32px -8px rgba(0,0,0,0.12)',
+          'glow': '0 0 0 4px rgba(245,197,24,0.18)',
+        }
+      }
+    }
+  }
+</script>
+<style>
+  /* ===================== Base ===================== */
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #FAFAF7;
+    color: #1F1F1C;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===================== Scrollbars ===================== */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: #E5E5DD;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #C9C9BD; background-clip: padding-box; }
+
+  /* ===================== Panels ===================== */
+  .panel {
+    background: #FFFFFF;
+    border: 1px solid #ECECE5;
+    border-radius: 14px;
+  }
+
+  .glass {
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+  }
+
+  /* ===================== Buttons ===================== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all .18s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary {
+    background: linear-gradient(135deg, #FFDD3A 0%, #F5C518 100%);
+    color: #3D2F03;
+    box-shadow: 0 4px 14px -4px rgba(245,197,24,0.6), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 6px 18px -4px rgba(245,197,24,0.7), inset 0 1px 0 rgba(255,255,255,0.5);
+    transform: translateY(-1px);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: #4A4A43;
+  }
+  .btn-ghost:hover { background: #F4F4EE; color: #1F1F1C; }
+  .btn-soft {
+    background: #F4F4EE;
+    color: #33332E;
+    border-color: #ECECE5;
+  }
+  .btn-soft:hover { background: #ECECE5; }
+  .btn-icon {
+    width: 34px; height: 34px;
+    padding: 0;
+  }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* ===================== Top Bar ===================== */
+  .topbar {
+    height: 56px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid #ECECE5;
+    position: relative;
+    z-index: 50;
+  }
+
+  .logo-mark {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #FFDD3A 0%, #F5C518 60%, #D9A90E 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px -4px rgba(245,197,24,0.55), inset 0 1px 0 rgba(255,255,255,0.45);
+    position: relative;
+    overflow: hidden;
+  }
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.55), transparent 55%);
+  }
+
+  /* ===================== Tabs (left panel) ===================== */
+  .left-tab {
+    padding: 10px 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #8C8C81;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all .18s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+  }
+  .left-tab:hover { color: #33332E; background: #F8F8F2; }
+  .left-tab.active {
+    color: #A87E08;
+    background: #FFF9D9;
+  }
+  .left-tab.active::before {
+    content: '';
+    position: absolute;
+    left: -2px; top: 8px; bottom: 8px;
+    width: 3px;
+    background: #F5C518;
+    border-radius: 3px;
+  }
+
+  /* ===================== Sidebar Section Title ===================== */
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8C8C81;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* ===================== Element Cards ===================== */
+  .elem-card {
+    background: #FFFFFF;
+    border: 1px solid #ECECE5;
+    border-radius: 10px;
+    cursor: grab;
+    transition: all .2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .elem-card:hover {
+    border-color: #F5C518;
+    box-shadow: 0 4px 12px -4px rgba(245,197,24,0.35);
+    transform: translateY(-2px);
+  }
+  .elem-card:active { cursor: grabbing; transform: translateY(0); }
+
+  /* ===================== Canvas ===================== */
+  #canvasWrap {
+    background:
+      radial-gradient(circle at 20% 30%, #FFFDF2 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, #FFF9D9 0%, transparent 50%),
+      #FAFAF5;
+    background-size: 100% 100%;
+  }
+  .canvas-grid {
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  #posterCanvas {
+    background: #FFFFFF;
+    position: relative;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,0.18), 0 4px 12px -4px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transform-origin: center center;
+  }
+
+  /* ===================== Poster Elements ===================== */
+  .poster-element {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    transform-origin: center center;
+  }
+  .poster-element.selected {
+    outline: 2px solid #F5C518;
+    outline-offset: 0px;
+  }
+  .poster-element.locked { cursor: default; }
+  .poster-element.hidden-elem { display: none; }
+
+  /* selection handles */
+  .handle {
+    position: absolute;
+    width: 10px; height: 10px;
+    background: #FFFFFF;
+    border: 2px solid #F5C518;
+    border-radius: 50%;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  .handle.nw { top: -5px; left: -5px; cursor: nwse-resize; }
+  .handle.ne { top: -5px; right: -5px; cursor: nesw-resize; }
+  .handle.sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+  .handle.se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+  .handle.n  { top: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+  .handle.s  { bottom: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+  .handle.w  { top: 50%; left: -5px; transform: translateY(-50%); cursor: ew-resize; }
+  .handle.e  { top: 50%; right: -5px; transform: translateY(-50%); cursor: ew-resize; }
+  .handle.rot {
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #F5C518;
+    border-color: #FFFFFF;
+    cursor: grab;
+  }
+  .handle.rot::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%;
+    width: 2px; height: 18px;
+    background: #F5C518;
+    transform: translateX(-50%);
+  }
+
+  /* alignment guides */
+  .guide-line {
+    position: absolute;
+    background: #FF4D8D;
+    z-index: 99;
+    pointer-events: none;
+  }
+  .guide-line.h { height: 1px; left: 0; right: 0; }
+  .guide-line.v { width: 1px; top: 0; bottom: 0; }
+
+  /* ===================== Inspector inputs ===================== */
+  .field-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #8C8C81;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .input, .select, .textarea {
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid #E5E5DD;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 12px;
+    color: #1F1F1C;
+    transition: all .15s ease;
+    font-family: inherit;
+  }
+  .input:focus, .select:focus, .textarea:focus {
+    outline: none;
+    border-color: #F5C518;
+    box-shadow: 0 0 0 3px rgba(245,197,24,0.18);
+  }
+  .input-num { font-variant-numeric: tabular-nums; }
+  .textarea { resize: vertical; min-height: 60px; }
+
+  /* color swatches */
+  .color-input {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1px solid #E5E5DD;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    padding: 0;
+    background: transparent;
+  }
+  .color-input::-webkit-color-swatch-wrapper { padding: 0; }
+  .color-input::-webkit-color-swatch { border: none; border-radius: 7px; }
+
+  .swatch {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all .15s ease;
+    position: relative;
+  }
+  .swatch:hover { transform: scale(1.1); }
+  .swatch.active { border-color: #1F1F1C; transform: scale(1.1); }
+  .swatch.checker {
+    background:
+      linear-gradient(45deg, #ccc 25%, transparent 25%),
+      linear-gradient(-45deg, #ccc 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #ccc 75%),
+      linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+  }
+
+  /* range slider */
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #E5E5DD;
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #F5C518;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #F5C518;
+    cursor: pointer;
+    border: none;
+  }
+
+  /* segmented control */
+  .seg {
+    display: inline-flex;
+    background: #F4F4EE;
+    border-radius: 8px;
+    padding: 2px;
+    gap: 2px;
+  }
+  .seg button {
+    flex: 1;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #66665D;
+    transition: all .15s ease;
+    cursor: pointer;
+  }
+  .seg button.active {
+    background: #FFFFFF;
+    color: #1F1F1C;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* layers panel */
+  .layer-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .12s ease;
+    font-size: 12px;
+  }
+  .layer-row:hover { background: #F8F8F2; }
+  .layer-row.active { background: #FFF9D9; }
+  .layer-row .layer-thumb {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: #F4F4EE;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #66665D;
+  }
+
+  /* templates grid */
+  .tpl-card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #ECECE5;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: all .2s ease;
+    position: relative;
+  }
+  .tpl-card:hover {
+    border-color: #F5C518;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -8px rgba(245,197,24,0.35);
+  }
+  .tpl-preview {
+    aspect-ratio: 3/4;
+    background: linear-gradient(135deg, #FFFDF2, #FFF9D9);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* icon picker grid */
+  .icon-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #FFFFFF;
+    border: 1px solid #ECECE5;
+    cursor: grab;
+    color: #4A4A43;
+    transition: all .15s ease;
+  }
+  .icon-cell:hover {
+    background: #FFF9D9;
+    border-color: #F5C518;
+    color: #A87E08;
+    transform: scale(1.05);
+  }
+
+  /* toast */
+  .toast {
+    background: #1F1F1C;
+    color: #FFFFFF;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: toast-in .25s ease;
+  }
+  .toast.success { background: #1F7A4D; }
+  .toast.error { background: #B83A3A; }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,15,12,0.55);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fade-in .2s ease;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .modal-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    max-width: 560px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: auto;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,0.4);
+    animation: modal-in .25s ease;
+  }
+  @keyframes modal-in {
+    from { transform: scale(0.96); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* dropdown menu */
+  .menu {
+    position: absolute;
+    background: #FFFFFF;
+    border: 1px solid #ECECE5;
+    border-radius: 10px;
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.18);
+    z-index: 100;
+    min-width: 200px;
+    padding: 4px;
+    animation: menu-in .15s ease;
+  }
+  @keyframes menu-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #1F1F1C;
+    transition: all .12s ease;
+  }
+  .menu-item:hover { background: #F8F8F2; }
+  .menu-item.danger { color: #B83A3A; }
+  .menu-item.danger:hover { background: #FFF0F0; }
+  .menu-divider { height: 1px; background: #ECECE5; margin: 4px 0; }
+  .menu-shortcut {
+    margin-left: auto;
+    font-size: 11px;
+    color: #8C8C81;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* empty state */
+  .empty-state {
+    text-align: center;
+    color: #8C8C81;
+    padding: 24px 12px;
+    font-size: 12px;
+  }
+
+  /* tooltip */
+  [data-tip] { position: relative; }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1F1F1C;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 200;
+  }
+
+  /* pulse loader */
+  .pulse {
+    width: 10px; height: 10px;
+    background: #1F7A4D;
+    border-radius: 50%;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  /* shimmer */
+  .shimmer {
+    background: linear-gradient(90deg, #F4F4EE 25%, #ECECE5 50%, #F4F4EE 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* canvas controls */
+  .canvas-ctrl {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: #FFFFFF;
+    border: 1px solid #ECECE5;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all .15s ease;
+    color: #4A4A43;
+  }
+  .canvas-ctrl:hover { border-color: #F5C518; color: #A87E08; }
+
+  /* fonts preview */
+  .font-preview {
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .15s ease;
+    font-size: 14px;
+  }
+  .font-preview:hover { background: #F8F8F2; border-color: #ECECE5; }
+  .font-preview.active { background: #FFF9D9; border-color: #F5C518; color: #A87E08; }
+
+  /* footer templates */
+  .footer-template {
+    background: #FFFFFF;
+    border: 1px solid #ECECE5;
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: grab;
+    transition: all .18s ease;
+  }
+  .footer-template:hover {
+    border-color: #F5C518;
+    box-shadow: 0 4px 12px -4px rgba(245,197,24,0.35);
+  }
+
+  /* misc */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    padding: 2px 5px;
+    font-size: 11px;
+    font-weight: 500;
+    background: #F4F4EE;
+    border: 1px solid #ECECE5;
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    color: #4A4A43;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+
+  .divider-v { width: 1px; background: #ECECE5; align-self: stretch; margin: 0 4px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .badge-soft {
+    background: #FFF9D9;
+    color: #A87E08;
+  }
+
+  /* drag preview ghost */
+  .drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.75;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
+  }
+
+  /* canvas element child rendering */
+  .el-text {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    word-break: break-word;
+    overflow: hidden;
+  }
+  .el-shape { width: 100%; height: 100%; }
+  .el-image { width: 100%; height: 100%; object-fit: contain; }
+  .el-icon { width: 100%; height: 100%; }
+
+  /* hint chip on empty canvas */
+  .canvas-hint {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    border: 1px dashed #F5C518;
+    border-radius: 14px;
+    padding: 16px 24px;
+    text-align: center;
+    color: #8C8C81;
+    font-size: 13px;
+    pointer-events: none;
+    box-shadow: 0 4px 20px -4px rgba(245,197,24,0.25);
+    z-index: 1;
+  }
+
+  /* inspector group */
+  .insp-group {
+    border: 1px solid #ECECE5;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .insp-group-head {
+    padding: 10px 12px;
+    background: #F8F8F2;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #66665D;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .insp-group-body {
+    padding: 12px;
+    display: grid;
+    gap: 10px;
+  }
+
+  /* gradient picker */
+  .gradient-swatch {
+    height: 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all .15s ease;
+  }
+  .gradient-swatch:hover { transform: scale(1.04); }
+  .gradient-swatch.active { border-color: #1F1F1C; }
+
+  /* align buttons */
+  .align-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: #FFFFFF;
+    border: 1px solid #ECECE5;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4A4A43;
+    transition: all .15s ease;
+  }
+  .align-btn:hover { background: #F8F8F2; color: #A87E08; border-color: #F5C518; }
+</style>
+</head>
+<body class="h-screen w-screen overflow-hidden">
+
+<!-- ===================== Top Bar ===================== -->
+<header class="topbar flex items-center px-4 gap-3">
+  <!-- Logo -->
+  <div class="flex items-center gap-2.5">
+    <div class="logo-mark">
+      <span class="text-base font-black" style="color:#3D2F03; position:relative; z-index:1;">ε</span>
+    </div>
+    <div class="leading-tight">
+      <div class="text-[15px] font-bold tracking-tight">Epsilon Edits</div>
+      <div class="text-[10px] text-ink-400 font-medium uppercase tracking-wider">Poster Designer</div>
+    </div>
+  </div>
+
+  <div class="divider-v h-7 mx-2"></div>
+
+  <!-- File menu -->
+  <div class="relative">
+    <button class="btn btn-ghost px-3 py-1.5" id="fileMenuBtn">
+      <i data-lucide="file" class="w-4 h-4"></i> File
+    </button>
+    <div id="fileMenu" class="menu hidden" style="top:48px; left:0;">
+      <div class="menu-item" data-action="new"><i data-lucide="file-plus" class="w-4 h-4"></i> New Poster <span class="menu-shortcut">Ctrl+N</span></div>
+      <div class="menu-item" data-action="save"><i data-lucide="save" class="w-4 h-4"></i> Save Design <span class="menu-shortcut">Ctrl+S</span></div>
+      <div class="menu-item" data-action="load"><i data-lucide="folder-open" class="w-4 h-4"></i> Open Saved</div>
+      <div class="menu-divider"></div>
+      <div class="menu-item" data-action="export-png"><i data-lucide="image" class="w-4 h-4"></i> Export PNG <span class="menu-shortcut">Ctrl+E</span></div>
+      <div class="menu-item" data-action="export-jpg"><i data-lucide="image" class="w-4 h-4"></i> Export JPG</div>
+      <div class="menu-item" data-action="export-transparent"><i data-lucide="layers" class="w-4 h-4"></i> Export Transparent PNG</div>
+      <div class="menu-item" data-action="print"><i data-lucide="printer" class="w-4 h-4"></i> Print</div>
+    </div>
+  </div>
+
+  <!-- Edit menu -->
+  <div class="relative">
+    <button class="btn btn-ghost px-3 py-1.5" id="editMenuBtn">
+      <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
+    </button>
+    <div id="editMenu" class="menu hidden" style="top:48px; left:0;">
+      <div class="menu-item" data-action="undo"><i data-lucide="undo-2" class="w-4 h-4"></i> Undo <span class="menu-shortcut">Ctrl+Z</span></div>
+      <div class="menu-item" data-action="redo"><i data-lucide="redo-2" class="w-4 h-4"></i> Redo <span class="menu-shortcut">Ctrl+Y</span></div>
+      <div class="menu-divider"></div>
+      <div class="menu-item" data-action="duplicate"><i data-lucide="copy" class="w-4 h-4"></i> Duplicate <span class="menu-shortcut">Ctrl+D</span></div>
+      <div class="menu-item" data-action="delete"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete <span class="menu-shortcut">Del</span></div>
+      <div class="menu-divider"></div>
+      <div class="menu-item" data-action="bring-front"><i data-lucide="bring-to-front" class="w-4 h-4"></i> Bring to Front</div>
+      <div class="menu-item" data-action="send-back"><i data-lucide="send-to-back" class="w-4 h-4"></i> Send to Back</div>
+      <div class="menu-item" data-action="bring-forward"><i data-lucide="chevron-up" class="w-4 h-4"></i> Bring Forward</div>
+      <div class="menu-item" data-action="send-backward"><i data-lucide="chevron-down" class="w-4 h-4"></i> Send Backward</div>
+    </div>
+  </div>
+
+  <!-- View menu -->
+  <div class="relative">
+    <button class="btn btn-ghost px-3 py-1.5" id="viewMenuBtn">
+      <i data-lucide="eye" class="w-4 h-4"></i> View
+    </button>
+    <div id="viewMenu" class="menu hidden" style="top:48px; left:0;">
+      <div class="menu-item" data-action="zoom-in"><i data-lucide="zoom-in" class="w-4 h-4"></i> Zoom In <span class="menu-shortcut">Ctrl++</span></div>
+      <div class="menu-item" data-action="zoom-out"><i data-lucide="zoom-out" class="w-4 h-4"></i> Zoom Out <span class="menu-shortcut">Ctrl+-</span></div>
+      <div class="menu-item" data-action="zoom-fit"><i data-lucide="maximize-2" class="w-4 h-4"></i> Fit to Screen <span class="menu-shortcut">Ctrl+0</span></div>
+      <div class="menu-item" data-action="zoom-100"><i data-lucide="frame" class="w-4 h-4"></i> 100%</div>
+      <div class="menu-divider"></div>
+      <div class="menu-item" data-action="toggle-grid"><i data-lucide="grid-3x3" class="w-4 h-4"></i> Toggle Grid</div>
+      <div class="menu-item" data-action="toggle-snap"><i data-lucide="magnet" class="w-4 h-4"></i> Toggle Snap</div>
+      <div class="menu-item" data-action="toggle-guides"><i data-lucide="ruler" class="w-4 h-4"></i> Toggle Smart Guides</div>
+    </div>
+  </div>
+
+  <div class="divider-v h-7 mx-1"></div>
+
+  <!-- Undo/Redo quick buttons -->
+  <button class="btn btn-ghost btn-icon" id="btnUndo" data-tip="Undo (Ctrl+Z)"><i data-lucide="undo-2" class="w-4 h-4"></i></button>
+  <button class="btn btn-ghost btn-icon" id="btnRedo" data-tip="Redo (Ctrl+Y)"><i data-lucide="redo-2" class="w-4 h-4"></i></button>
+
+  <div class="divider-v h-7 mx-1"></div>
+
+  <!-- Canvas size presets -->
+  <select id="canvasPreset" class="select" style="width:170px;">
+    <option value="custom">Custom Size</option>
+    <option value="800,1100">Portrait · 800×1100</option>
+    <option value="1100,800">Landscape · 1100×800</option>
+    <option value="1080,1080">Instagram Square · 1080²</option>
+    <option value="1080,1350">Instagram Portrait · 1080×1350</option>
+    <option value="1080,1920">Instagram Story · 1080×1920</option>
+    <option value="1200,628">Facebook Banner · 1200×628</option>
+    <option value="1500,500">Twitter Header · 1500×500</option>
+    <option value="2480,3508">A4 Print · 2480×3508</option>
+    <option value="595,842">A4 Screen · 595×842</option>
+    <option value="2550,3300">Letter Print · 2550×3300</option>
+    <option value="800,800">Square · 800×800</option>
+  </select>
+
+  <div class="flex items-center gap-1 ml-1">
+    <input type="number" id="canvasW" class="input input-num" style="width:64px;" value="800"/>
+    <span class="text-ink-400 text-xs">×</span>
+    <input type="number" id="canvasH" class="input input-num" style="width:64px;" value="1100"/>
+    <button class="btn btn-soft btn-icon" id="applyCanvasSize" data-tip="Apply Size"><i data-lucide="check" class="w-4 h-4"></i></button>
+  </div>
+
+  <!-- spacer -->
+  <div class="flex-1"></div>
+
+  <!-- Right side -->
+  <div class="flex items-center gap-2">
+    <span class="badge badge-soft" id="autosaveBadge"><span class="pulse mr-1.5"></span>Autosave</span>
+    <button class="btn btn-soft" id="btnHelp" data-tip="Help & Shortcuts">
+      <i data-lucide="help-circle" class="w-4 h-4"></i>
+    </button>
+    <button class="btn btn-soft" id="btnTemplates" data-tip="Browse Templates">
+      <i data-lucide="layout-grid" class="w-4 h-4"></i> Templates
+    </button>
+    <button class="btn btn-primary" id="btnExport" data-tip="Export as PNG (Ctrl+E)">
+      <i data-lucide="download" class="w-4 h-4"></i> Export
+    </button>
+  </div>
+</header>
+
+<!-- ===================== Main Layout ===================== -->
+<div class="flex" style="height: calc(100vh - 56px - 36px);">
+
+  <!-- Left rail (icons) -->
+  <aside class="flex flex-col items-center gap-1 px-1.5 py-2 bg-white border-r border-ink-100" style="width:60px;">
+    <div class="left-tab active" data-left-tab="templates" data-tip="Templates">
+      <i data-lucide="layout-template" class="w-5 h-5"></i>
+      <span>Templates</span>
+    </div>
+    <div class="left-tab" data-left-tab="shapes" data-tip="Shapes">
+      <i data-lucide="shapes" class="w-5 h-5"></i>
+      <span>Shapes</span>
+    </div>
+    <div class="left-tab" data-left-tab="text" data-tip="Text">
+      <i data-lucide="type" class="w-5 h-5"></i>
+      <span>Text</span>
+    </div>
+    <div class="left-tab" data-left-tab="icons" data-tip="Icons">
+      <i data-lucide="smile" class="w-5 h-5"></i>
+      <span>Icons</span>
+    </div>
+    <div class="left-tab" data-left-tab="images" data-tip="Images">
+      <i data-lucide="image" class="w-5 h-5"></i>
+      <span>Images</span>
+    </div>
+    <div class="left-tab" data-left-tab="footers" data-tip="Footers">
+      <i data-lucide="panel-bottom" class="w-5 h-5"></i>
+      <span>Footers</span>
+    </div>
+    <div class="left-tab" data-left-tab="backgrounds" data-tip="Backgrounds">
+      <i data-lucide="paint-bucket" class="w-5 h-5"></i>
+      <span>BG</span>
+    </div>
+    <div class="left-tab" data-left-tab="uploads" data-tip="My Uploads">
+      <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+      <span>Uploads</span>
+    </div>
+    <div class="flex-1"></div>
+    <div class="left-tab" data-left-tab="layers" data-tip="Layers">
+      <i data-lucide="layers-2" class="w-5 h-5"></i>
+      <span>Layers</span>
+    </div>
+  </aside>
+
+  <!-- Left panel content -->
+  <aside class="bg-white border-r border-ink-100 flex flex-col" style="width:280px;">
+    <div class="px-3 py-2.5 border-b border-ink-100 flex items-center justify-between">
+      <div class="text-sm font-semibold flex items-center gap-2" id="leftPanelTitle">
+        <i data-lucide="layout-template" class="w-4 h-4 text-epsilon-600"></i>
+        <span>Templates</span>
+      </div>
+      <button class="btn btn-ghost btn-icon" data-tip="Close panel" id="closeLeftPanel">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-3" id="leftPanelContent">
+      <!-- content injected by JS -->
+    </div>
+  </aside>
+
+  <!-- Canvas area -->
+  <main class="flex-1 relative" id="canvasWrap">
+    <!-- top floating bar -->
+    <div class="absolute top-3 left-1/2 -translate-x-1/2 glass rounded-xl px-2 py-1.5 flex items-center gap-1 z-30 border border-ink-100 shadow-soft">
+      <button class="canvas-ctrl" id="zoomOutBtn" data-tip="Zoom Out"><i data-lucide="zoom-out" class="w-4 h-4"></i></button>
+      <span class="text-xs font-medium px-2 min-w-[44px] text-center" id="zoomLabel">100%</span>
+      <button class="canvas-ctrl" id="zoomInBtn" data-tip="Zoom In"><i data-lucide="zoom-in" class="w-4 h-4"></i></button>
+      <button class="canvas-ctrl" id="zoomFitBtn" data-tip="Fit"><i data-lucide="maximize-2" class="w-4 h-4"></i></button>
+      <div class="divider-v h-5 mx-1"></div>
+      <button class="canvas-ctrl" id="gridBtn" data-tip="Toggle Grid"><i data-lucide="grid-3x3" class="w-4 h-4"></i></button>
+      <button class="canvas-ctrl" id="snapBtn" data-tip="Snap to Grid"><i data-lucide="magnet" class="w-4 h-4"></i></button>
+      <button class="canvas-ctrl" id="clearBtn" data-tip="Clear Canvas"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+    </div>
+
+    <!-- alignment guides layer -->
+    <div id="guidesLayer" class="absolute inset-0 pointer-events-none z-20"></div>
+
+    <!-- scroll container -->
+    <div class="absolute inset-0 overflow-auto" id="canvasScroll">
+      <div class="min-h-full min-w-full flex items-center justify-center p-12">
+        <div id="posterCanvas" style="width:800px; height:1100px;">
+          <!-- elements injected by JS -->
+          <div class="canvas-hint" id="canvasHint">
+            <div class="flex items-center gap-2 justify-center mb-1.5">
+              <i data-lucide="mouse-pointer-click" class="w-5 h-5 text-epsilon-600"></i>
+              <span class="font-semibold text-ink-700">Start designing</span>
+            </div>
+            Drag elements from the left panel, or pick a template to begin.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- bottom floating info -->
+    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 glass rounded-xl px-3 py-1.5 z-30 border border-ink-100 shadow-soft flex items-center gap-3 text-[11px] text-ink-500">
+      <span id="cursorPos">x: 0  y: 0</span>
+      <span class="text-ink-200">·</span>
+      <span id="canvasInfo">800 × 1100 px</span>
+      <span class="text-ink-200">·</span>
+      <span id="elementCount">0 elements</span>
+    </div>
+  </main>
+
+  <!-- Right panel: Inspector -->
+  <aside class="bg-white border-l border-ink-100 flex flex-col" style="width:300px;">
+    <div class="px-3 py-2.5 border-b border-ink-100 flex items-center justify-between">
+      <div class="text-sm font-semibold flex items-center gap-2">
+        <i data-lucide="sliders" class="w-4 h-4 text-epsilon-600"></i>
+        <span>Inspector</span>
+      </div>
+      <span class="badge badge-soft" id="inspectorBadge">No selection</span>
+    </div>
+    <div class="flex-1 overflow-y-auto p-3" id="inspectorContent">
+      <div class="empty-state">
+        <i data-lucide="mouse-pointer-2" class="w-10 h-10 mx-auto mb-3 text-ink-200"></i>
+        <div class="font-medium text-ink-400 text-sm mb-1">Nothing selected</div>
+        <div class="text-xs">Select an element on the canvas to edit its properties.</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ===================== Bottom Bar ===================== -->
+<footer class="h-9 bg-white border-t border-ink-100 flex items-center px-3 gap-3 text-[11px] text-ink-500">
+  <div class="flex items-center gap-1.5">
+    <span class="pulse" style="background:#F5C518;"></span>
+    <span class="font-medium text-ink-700">Epsilon Edits</span>
+    <span class="text-ink-300">·</span>
+    <span id="statusMsg">Ready</span>
+  </div>
+  <div class="divider-v h-4"></div>
+  <span>History: <span id="historyInfo" class="font-mono text-ink-700">0/0</span></span>
+  <div class="divider-v h-4"></div>
+  <span>Selected: <span id="selectedInfo" class="font-mono text-ink-700">—</span></span>
+  <div class="flex-1"></div>
+  <div class="flex items-center gap-2">
+    <span class="kbd">Ctrl+Z</span><span>Undo</span>
+    <span class="kbd">Ctrl+D</span><span>Duplicate</span>
+    <span class="kbd">Del</span><span>Delete</span>
+    <span class="kbd">Ctrl+E</span><span>Export</span>
+  </div>
+</footer>
+
+<!-- ===================== Toast container ===================== -->
+<div id="toastContainer" class="fixed bottom-14 right-4 z-[300] flex flex-col gap-2 items-end"></div>
+
+<!-- ===================== Modals container ===================== -->
+<div id="modalRoot"></div>
+
+<script>
+/* ============================================================
+   EPSILON EDITS · POSTER DESIGNER
+   Single-file poster design studio.
+   ============================================================ */
+
+/* ---------- Global State ---------- */
+const state = {
+  elements: [],            // array of element objects
+  selectedId: null,
+  selectedIds: [],         // for multi-select (future)
+  history: [],
+  historyIndex: -1,
+  maxHistory: 50,
+  zoom: 1,
+  minZoom: 0.1,
+  maxZoom: 4,
+  canvas: {
+    width: 800,
+    height: 1100,
+    background: '#FFFFFF',
+    backgroundType: 'solid', // 'solid' | 'gradient' | 'image' | 'transparent'
+    gradient: null,
+  },
+  grid: { show: false, size: 20 },
+  snap: { enabled: false, threshold: 8 },
+  smartGuides: true,
+  uploads: [],             // user-uploaded images [{id, name, src}]
+  currentLeftTab: 'templates',
+  isDragging: false,
+  dragData: null,
+  autosaveTimer: null,
+  keyHeld: {},
+};
+
+let elementIdCounter = 1;
+
+/* ---------- Utility Functions ---------- */
+function uid() {
+  return 'el_' + (elementIdCounter++).toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function $(sel) { return document.querySelector(sel); }
+function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+function round(v, p = 0) {
+  const f = Math.pow(10, p);
+  return Math.round(v * f) / f;
+}
+function rad2deg(r) { return r * 180 / Math.PI; }
+function deg2rad(d) { return d * Math.PI / 180; }
+
+function deepClone(o) {
+  return JSON.parse(JSON.stringify(o));
+}
+
+function toast(msg, type = 'default', duration = 2400) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type !== 'default' ? type : '');
+  const iconName = type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info';
+  t.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4"></i><span>${esc(msg)}</span>`;
+  $('#toastContainer').appendChild(t);
+  if (window.lucide) lucide.createIcons({ nameAttr: 'data-lucide', attrs: {} });
+  setTimeout(() => {
+    t.style.transition = 'all .25s ease';
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(20px)';
+    setTimeout(() => t.remove(), 250);
+  }, duration);
+}
+
+function setStatus(msg) { $('#statusMsg').textContent = msg; }
+
+/* ---------- Element Factory ---------- */
+function createElement(type, overrides = {}) {
+  const base = {
+    id: uid(),
+    type,
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 100,
+    rotation: 0,
+    opacity: 1,
+    locked: false,
+    visible: true,
+    name: '',
+  };
+
+  let typeSpecific = {};
+  switch (type) {
+    case 'text':
+      typeSpecific = {
+        text: 'Double-click to edit',
+        fontFamily: 'Inter',
+        fontSize: 32,
+        fontWeight: 600,
+        fontStyle: 'normal',
+        textDecoration: 'none',
+        color: '#1F1F1C',
+        textAlign: 'left',
+        lineHeight: 1.2,
+        letterSpacing: 0,
+        backgroundColor: 'transparent',
+        padding: 4,
+      };
+      break;
+    case 'shape':
+      typeSpecific = {
+        shape: 'rectangle', // rectangle | circle | triangle | star | polygon | heart | line | arrow | hexagon
+        fill: '#F5C518',
+        fillType: 'solid', // solid | gradient | none
+        gradient: null,
+        stroke: '#1F1F1C',
+        strokeWidth: 0,
+        strokeStyle: 'solid', // solid | dashed | dotted
+        borderRadius: 0,
+        sides: 6,           // for polygon
+        starPoints: 5,      // for star
+        shadow: false,
+        shadowColor: 'rgba(0,0,0,0.2)',
+        shadowBlur: 8,
+        shadowX: 2,
+        shadowY: 4,
+      };
+      break;
+    case 'image':
+      typeSpecific = {
+        src: '',
+        fit: 'cover', // cover | contain | fill
+        borderRadius: 0,
+        filter: 'none',
+        brightness: 100,
+        contrast: 100,
+        saturate: 100,
+        grayscale: 0,
+        sepia: 0,
+        blur: 0,
+        invert: 0,
+      };
+      break;
+    case 'icon':
+      typeSpecific = {
+        iconName: 'star',
+        color: '#F5C518',
+        strokeWidth: 2,
+        fill: false,
+        backgroundColor: 'transparent',
+        borderRadius: 0,
+      };
+      break;
+    case 'footer':
+      typeSpecific = {
+        layout: 'simple', // simple | columns | brand | social
+        brandName: 'Your Brand',
+        tagline: 'yourbrand.com',
+        contact: 'hello@brand.com · +1 (555) 012-3456',
+        social: 'Instagram · Twitter · LinkedIn',
+        bgColor: '#1F1F1C',
+        textColor: '#FFFFFF',
+        accentColor: '#F5C518',
+        fontFamily: 'Inter',
+        fontSize: 12,
+      };
+      break;
+  }
+  return Object.assign(base, typeSpecific, overrides);
+}
+
+/* ---------- Element Default Sizing ---------- */
+function defaultElementSize(type) {
+  switch (type) {
+    case 'text':   return { width: 240, height: 60 };
+    case 'shape':  return { width: 160, height: 160 };
+    case 'image':  return { width: 240, height: 240 };
+    case 'icon':   return { width: 80,  height: 80 };
+    case 'footer': return { width: 600, height: 60 };
+    default:       return { width: 200, height: 100 };
+  }
+}
+
+/* ---------- History (Undo/Redo) ---------- */
+function saveHistory() {
+  // Drop any redo tail
+  state.history = state.history.slice(0, state.historyIndex + 1);
+  state.history.push(deepClone(state.elements));
+  if (state.history.length > state.maxHistory) state.history.shift();
+  state.historyIndex = state.history.length - 1;
+  updateHistoryInfo();
+  scheduleAutosave();
+}
+
+function undo() {
+  if (state.historyIndex <= 0) { toast('Nothing to undo', 'error', 1200); return; }
+  state.historyIndex--;
+  state.elements = deepClone(state.history[state.historyIndex]);
+  if (state.selectedId && !state.elements.find(e => e.id === state.selectedId)) state.selectedId = null;
+  renderAll();
+  toast('Undo', 'default', 1000);
+}
+
+function redo() {
+  if (state.historyIndex >= state.history.length - 1) { toast('Nothing to redo', 'error', 1200); return; }
+  state.historyIndex++;
+  state.elements = deepClone(state.history[state.historyIndex]);
+  if (state.selectedId && !state.elements.find(e => e.id === state.selectedId)) state.selectedId = null;
+  renderAll();
+  toast('Redo', 'default', 1000);
+}
+
+function updateHistoryInfo() {
+  $('#historyInfo').textContent = `${state.historyIndex + 1}/${state.history.length}`;
+}
+
+/* ---------- Autosave ---------- */
+function scheduleAutosave() {
+  if (state.autosaveTimer) clearTimeout(state.autosaveTimer);
+  state.autosaveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem('epsilon_edits_autosave', JSON.stringify({
+        elements: state.elements,
+        canvas: state.canvas,
+        savedAt: Date.now(),
+      }));
+    } catch (e) { /* storage full or disabled */ }
+  }, 1500);
+}
+
+function loadAutosave() {
+  try {
+    const raw = localStorage.getItem('epsilon_edits_autosave');
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data || !data.elements) return false;
+    state.elements = data.elements;
+    state.canvas = Object.assign(state.canvas, data.canvas || {});
+    saveHistory();
+    return true;
+  } catch (e) { return false; }
+}
+
+/* ---------- Element CRUD ---------- */
+function addElement(el, doHistory = true) {
+  state.elements.push(el);
+  if (doHistory) saveHistory();
+  state.selectedId = el.id;
+  renderAll();
+  return el;
+}
+
+function updateElement(id, patch, doHistory = true) {
+  const el = state.elements.find(e => e.id === id);
+  if (!el) return;
+  Object.assign(el, patch);
+  if (doHistory) saveHistory();
+  renderAll();
+}
+
+function deleteElement(id, doHistory = true) {
+  const idx = state.elements.findIndex(e => e.id === id);
+  if (idx === -1) return;
+  state.elements.splice(idx, 1);
+  if (state.selectedId === id) state.selectedId = null;
+  if (doHistory) saveHistory();
+  renderAll();
+}
+
+function duplicateElement(id) {
+  const el = state.elements.find(e => e.id === id);
+  if (!el) return;
+  const copy = deepClone(el);
+  copy.id = uid();
+  copy.x = (el.x || 0) + 20;
+  copy.y = (el.y || 0) + 20;
+  copy.name = (el.name || el.type) + ' copy';
+  state.elements.push(copy);
+  state.selectedId = copy.id;
+  saveHistory();
+  renderAll();
+  toast('Duplicated', 'success', 1200);
+}
+
+function getElement(id) { return state.elements.find(e => e.id === id); }
+function selectedEl() { return state.selectedId ? getElement(state.selectedId) : null; }
+
+/* ---------- Z-Order ---------- */
+function reorderElement(id, direction) {
+  const idx = state.elements.findIndex(e => e.id === id);
+  if (idx === -1) return;
+  const el = state.elements[idx];
+  state.elements.splice(idx, 1);
+  let newIdx;
+  switch (direction) {
+    case 'front':       newIdx = state.elements.length; break;
+    case 'back':        newIdx = 0; break;
+    case 'forward':     newIdx = Math.min(state.elements.length, idx + 1); break;
+    case 'backward':    newIdx = Math.max(0, idx - 1); break;
+    default:            newIdx = idx;
+  }
+  state.elements.splice(newIdx, 0, el);
+  saveHistory();
+  renderAll();
+}
+
+/* ---------- Canvas Render ---------- */
+function renderCanvas() {
+  const canvas = $('#posterCanvas');
+  canvas.style.width = state.canvas.width + 'px';
+  canvas.style.height = state.canvas.height + 'px';
+  // background
+  if (state.canvas.backgroundType === 'transparent') {
+    canvas.style.background = `
+      linear-gradient(45deg, #e0e0d8 25%, transparent 25%),
+      linear-gradient(-45deg, #e0e0d8 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #e0e0d8 75%),
+      linear-gradient(-45deg, transparent 75%, #e0e0d8 75%)`;
+    canvas.style.backgroundSize = '20px 20px';
+    canvas.style.backgroundPosition = '0 0, 0 10px, 10px -10px, -10px 0px';
+  } else if (state.canvas.backgroundType === 'gradient' && state.canvas.gradient) {
+    const g = state.canvas.gradient;
+    canvas.style.background = `linear-gradient(${g.angle}deg, ${g.stops.join(', ')})`;
+  } else if (state.canvas.backgroundType === 'image' && state.canvas.backgroundImage) {
+    canvas.style.background = `url("${state.canvas.backgroundImage}") center/cover no-repeat`;
+  } else {
+    canvas.style.background = state.canvas.background || '#FFFFFF';
+  }
+
+  // remove old elements (except hint)
+  Array.from(canvas.querySelectorAll('.poster-element')).forEach(n => n.remove());
+  const hint = $('#canvasHint');
+  if (hint) hint.style.display = state.elements.length === 0 ? '' : 'none';
+
+  // render each element
+  state.elements.forEach(el => {
+    const node = renderElementNode(el);
+    canvas.appendChild(node);
+  });
+
+  // update info
+  $('#canvasInfo').textContent = `${state.canvas.width} × ${state.canvas.height} px`;
+  $('#elementCount').textContent = `${state.elements.length} element${state.elements.length === 1 ? '' : 's'}`;
+
+  // apply zoom transform
+  applyZoom();
+}
+
+function renderElementNode(el) {
+  const node = document.createElement('div');
+  node.className = 'poster-element';
+  if (!el.visible) node.classList.add('hidden-elem');
+  if (el.id === state.selectedId) node.classList.add('selected');
+  if (el.locked) node.classList.add('locked');
+  node.dataset.id = el.id;
+  node.style.left = el.x + 'px';
+  node.style.top = el.y + 'px';
+  node.style.width = el.width + 'px';
+  node.style.height = el.height + 'px';
+  node.style.transform = `rotate(${el.rotation || 0}deg)`;
+  node.style.opacity = el.opacity ?? 1;
+  node.style.zIndex = state.elements.indexOf(el) + 1;
+
+  node.innerHTML = elementInnerHTML(el);
+
+  if (el.id === state.selectedId) appendHandles(node);
+
+  // text editing on double click
+  if (el.type === 'text') {
+    node.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      enableTextEditing(el.id, node);
+    });
+  }
+
+  return node;
+}
+
+function elementInnerHTML(el) {
+  switch (el.type) {
+    case 'text': return renderTextInner(el);
+    case 'shape': return renderShapeInner(el);
+    case 'image': return renderImageInner(el);
+    case 'icon': return renderIconInner(el);
+    case 'footer': return renderFooterInner(el);
+    default: return '';
+  }
+}
+
+function renderTextInner(el) {
+  const ta = el.textAlign || 'left';
+  const valign = 'center';
+  const weight = el.fontWeight || 400;
+  const style = el.fontStyle || 'normal';
+  const deco = el.textDecoration || 'none';
+  const lh = el.lineHeight || 1.2;
+  const ls = (el.letterSpacing || 0) + 'px';
+  const color = el.color || '#1F1F1C';
+  const ff = `'${el.fontFamily}', sans-serif`;
+  const bg = el.backgroundColor && el.backgroundColor !== 'transparent' ? el.backgroundColor : 'transparent';
+  const pad = (el.padding ?? 4) + 'px';
+  return `<div class="el-text" style="
+    font-family:${ff};
+    font-size:${el.fontSize}px;
+    font-weight:${weight};
+    font-style:${style};
+    text-decoration:${deco};
+    color:${color};
+    text-align:${ta};
+    justify-content:${ta === 'center' ? 'center' : ta === 'right' ? 'flex-end' : 'flex-start'};
+    line-height:${lh};
+    letter-spacing:${ls};
+    background:${bg};
+    padding:${pad};
+    white-space:pre-wrap;
+  ">${esc(el.text)}</div>`;
+}
+
+function renderShapeInner(el) {
+  const shape = el.shape || 'rectangle';
+  const fill = buildShapeFill(el);
+  const stroke = el.strokeWidth > 0 ? `${el.strokeWidth}px ${el.strokeStyle === 'dashed' ? 'dashed' : el.strokeStyle === 'dotted' ? 'dotted' : 'solid'} ${el.stroke || '#000'}` : 'none';
+  const shadow = el.shadow ? `box-shadow:${el.shadowX}px ${el.shadowY}px ${el.shadowBlur}px ${el.shadowColor}` : 'none';
+  const br = el.borderRadius || 0;
+
+  switch (shape) {
+    case 'rectangle':
+      return `<div class="el-shape" style="background:${fill};border:${stroke};border-radius:${br}px;${shadow ? `box-shadow:${el.shadowX}px ${el.shadowY}px ${el.shadowBlur}px ${el.shadowColor}` : ''}"></div>`;
+    case 'circle':
+      return `<div class="el-shape" style="background:${fill};border:${stroke};border-radius:50%;${shadow ? `box-shadow:${el.shadowX}px ${el.shadowY}px ${el.shadowBlur}px ${el.shadowColor}` : ''}"></div>`;
+    case 'triangle':
+      return `<svg class="el-shape" viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="100%">
+        <polygon points="50,5 95,95 5,95" fill="${shapeFillAttr(el)}" stroke="${el.strokeWidth > 0 ? el.stroke : 'none'}" stroke-width="${el.strokeWidth}" stroke-dasharray="${dashArray(el)}" />
+      </svg>`;
+    case 'star':
+      return `<svg class="el-shape" viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="100%">
+        <polygon points="${starPoints(el.starPoints || 5, 50, 50, 48, 22)}" fill="${shapeFillAttr(el)}" stroke="${el.strokeWidth > 0 ? el.stroke : 'none'}" stroke-width="${el.strokeWidth}" stroke-dasharray="${dashArray(el)}" />
+      </svg>`;
+    case 'polygon':
+      return `<svg class="el-shape" viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="100%">
+        <polygon points="${polyPoints(el.sides || 6, 50, 50, 48)}" fill="${shapeFillAttr(el)}" stroke="${el.strokeWidth > 0 ? el.stroke : 'none'}" stroke-width="${el.strokeWidth}" stroke-dasharray="${dashArray(el)}" />
+      </svg>`;
+    case 'hexagon':
+      return `<svg class="el-shape" viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="100%">
+        <polygon points="${polyPoints(6, 50, 50, 48)}" fill="${shapeFillAttr(el)}" stroke="${el.strokeWidth > 0 ? el.stroke : 'none'}" stroke-width="${el.strokeWidth}" stroke-dasharray="${dashArray(el)}" />
+      </svg>`;
+    case 'heart':
+      return `<svg class="el-shape" viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="100%">
+        <path d="M50,88 C20,65 5,45 5,30 C5,15 17,5 30,5 C40,5 47,12 50,20 C53,12 60,5 70,5 C83,5 95,15 95,30 C95,45 80,65 50,88 Z" fill="${shapeFillAttr(el)}" stroke="${el.strokeWidth > 0 ? el.stroke : 'none'}" stroke-width="${el.strokeWidth}" stroke-dasharray="${dashArray(el)}" />
+      </svg>`;
+    case 'line':
+      return `<div class="el-shape" style="height:100%;display:flex;align-items:center;">
+        <div style="width:100%;height:${Math.max(el.strokeWidth,1)}px;background:${el.stroke || '#000'};${shadow ? `box-shadow:${el.shadowX}px ${el.shadowY}px ${el.shadowBlur}px ${el.shadowColor}` : ''}"></div>
+      </div>`;
+    case 'arrow':
+      return `<svg class="el-shape" viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="100%">
+        <defs><marker id="arr${el.id}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L9,3 L0,6 Z" fill="${el.stroke || '#000'}"/></marker></defs>
+        <line x1="2" y1="50" x2="90" y2="50" stroke="${el.stroke || '#000'}" stroke-width="${Math.max(el.strokeWidth, 1)}" marker-end="url(#arr${el.id})" stroke-dasharray="${dashArray(el)}" />
+      </svg>`;
+    default:
+      return '';
+  }
+}
+
+function buildShapeFill(el) {
+  if (el.fillType === 'none') return 'transparent';
+  if (el.fillType === 'gradient' && el.gradient) {
+    const g = el.gradient;
+    return `linear-gradient(${g.angle}deg, ${g.stops.join(', ')})`;
+  }
+  return el.fill || '#F5C518';
+}
+function shapeFillAttr(el) {
+  if (el.fillType === 'none') return 'transparent';
+  if (el.fillType === 'gradient' && el.gradient) return `url(#grad${el.id})`;
+  return el.fill || '#F5C518';
+}
+function dashArray(el) {
+  if (el.strokeStyle === 'dashed') return '8 4';
+  if (el.strokeStyle === 'dotted') return '2 4';
+  return 'none';
+}
+
+function starPoints(n, cx, cy, rOuter, rInner) {
+  const pts = [];
+  for (let i = 0; i < n * 2; i++) {
+    const r = i % 2 === 0 ? rOuter : rInner;
+    const a = (Math.PI * i) / n - Math.PI / 2;
+    pts.push(`${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`);
+  }
+  return pts.join(' ');
+}
+function polyPoints(n, cx, cy, r) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const a = (Math.PI * 2 * i) / n - Math.PI / 2;
+    pts.push(`${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`);
+  }
+  return pts.join(' ');
+}
+
+function renderImageInner(el) {
+  if (!el.src) {
+    return `<div class="el-shape" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#F4F4EE;border-radius:${el.borderRadius || 0}px;color:#8C8C81;font-size:12px;">No image</div>`;
+  }
+  const filter = buildImageFilter(el);
+  const fit = el.fit || 'cover';
+  return `<img src="${el.src}" class="el-image" style="object-fit:${fit};border-radius:${el.borderRadius || 0}px;filter:${filter}" draggable="false" />`;
+}
+function buildImageFilter(el) {
+  const parts = [];
+  if (el.brightness && el.brightness !== 100) parts.push(`brightness(${el.brightness}%)`);
+  if (el.contrast && el.contrast !== 100) parts.push(`contrast(${el.contrast}%)`);
+  if (el.saturate && el.saturate !== 100) parts.push(`saturate(${el.saturate}%)`);
+  if (el.grayscale) parts.push(`grayscale(${el.grayscale}%)`);
+  if (el.sepia) parts.push(`sepia(${el.sepia}%)`);
+  if (el.blur) parts.push(`blur(${el.blur}px)`);
+  if (el.invert) parts.push(`invert(${el.invert}%)`);
+  return parts.length ? parts.join(' ') : 'none';
+}
+
+function renderIconInner(el) {
+  const bg = el.backgroundColor && el.backgroundColor !== 'transparent' ? `background:${el.backgroundColor};border-radius:${el.borderRadius || 0}px;` : '';
+  const color = el.color || '#F5C518';
+  const sw = el.strokeWidth || 2;
+  const fill = el.fill ? color : 'none';
+  // we'll let lucide replace
+  return `<div class="el-icon" style="${bg}display:flex;align-items:center;justify-content:center;">
+    <i data-lucide="${el.iconName || 'star'}" style="color:${color};stroke-width:${sw};fill:${fill};width:80%;height:80%;"></i>
+  </div>`;
+}
+
+function renderFooterInner(el) {
+  const bg = el.bgColor || '#1F1F1C';
+  const tc = el.textColor || '#FFFFFF';
+  const ac = el.accentColor || '#F5C518';
+  const ff = `'${el.fontFamily}', sans-serif`;
+  const fs = (el.fontSize || 12) + 'px';
+  switch (el.layout) {
+    case 'simple':
+      return `<div style="width:100%;height:100%;background:${bg};color:${tc};font-family:${ff};font-size:${fs};display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+        <span style="font-weight:700;">${esc(el.brandName)}</span>
+        <span style="color:${ac};">${esc(el.tagline)}</span>
+      </div>`;
+    case 'columns':
+      return `<div style="width:100%;height:100%;background:${bg};color:${tc};font-family:${ff};font-size:${fs};display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:0 18px;">
+        <div style="font-weight:700;color:${ac};">${esc(el.brandName)}</div>
+        <div style="text-align:center;">${esc(el.contact)}</div>
+        <div style="text-align:right;">${esc(el.social)}</div>
+      </div>`;
+    case 'brand':
+      return `<div style="width:100%;height:100%;background:${bg};color:${tc};font-family:${ff};font-size:${fs};display:flex;align-items:center;gap:14px;padding:0 18px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:${ac};display:flex;align-items:center;justify-content:center;font-weight:900;color:${bg};font-size:16px;">${esc((el.brandName || 'B').charAt(0))}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;">${esc(el.brandName)}</div>
+          <div style="opacity:.7;font-size:${Math.max(fs-2, 9)}px;">${esc(el.tagline)}</div>
+        </div>
+      </div>`;
+    case 'social':
+      return `<div style="width:100%;height:100%;background:${bg};color:${tc};font-family:${ff};font-size:${fs};display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+        <div>
+          <div style="font-weight:700;">${esc(el.brandName)}</div>
+          <div style="opacity:.7;font-size:${Math.max(fs-2,9)}px;">${esc(el.contact)}</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          ${['instagram','twitter','linkedin','facebook'].map(s => `<div style="width:24px;height:24px;border-radius:50%;background:${ac};display:flex;align-items:center;justify-content:center;color:${bg};font-weight:bold;font-size:12px;">${s.charAt(0).toUpperCase()}</div>`).join('')}
+        </div>
+      </div>`;
+    default:
+      return '';
+  }
+}
+
+function appendHandles(node) {
+  ['nw','n','ne','e','se','s','sw','w'].forEach(p => {
+    const h = document.createElement('div');
+    h.className = 'handle ' + p;
+    h.dataset.handle = p;
+    node.appendChild(h);
+  });
+  const r = document.createElement('div');
+  r.className = 'handle rot';
+  r.dataset.handle = 'rot';
+  node.appendChild(r);
+}
+
+/* ---------- Inspector Panel ---------- */
+function renderInspector() {
+  const el = selectedEl();
+  const container = $('#inspectorContent');
+  const badge = $('#inspectorBadge');
+  if (!el) {
+    badge.textContent = 'No selection';
+    badge.className = 'badge badge-soft';
+    container.innerHTML = `<div class="empty-state">
+      <i data-lucide="mouse-pointer-2" class="w-10 h-10 mx-auto mb-3 text-ink-200"></i>
+      <div class="font-medium text-ink-400 text-sm mb-1">Nothing selected</div>
+      <div class="text-xs">Click an element on the canvas to edit its properties.</div>
+      <div class="mt-4 text-[11px] text-ink-300">Tip: drag from left panel to add elements.</div>
+    </div>`;
+    if (window.lucide) lucide.createIcons();
+    $('#selectedInfo').textContent = '—';
+    return;
+  }
+  badge.textContent = el.type;
+  badge.className = 'badge badge-soft';
+  $('#selectedInfo').textContent = `${el.type}#${el.id.slice(-4)}`;
+
+  let html = '';
+
+  // Quick actions row
+  html += `<div class="flex gap-1 mb-3 flex-wrap">
+    <button class="btn btn-soft text-xs px-2 py-1" data-quick="duplicate"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Duplicate</button>
+    <button class="btn btn-soft text-xs px-2 py-1" data-quick="delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete</button>
+    <button class="btn btn-soft text-xs px-2 py-1" data-quick="lock">${el.locked ? '<i data-lucide="lock" class="w-3.5 h-3.5"></i> Locked' : '<i data-lucide="unlock" class="w-3.5 h-3.5"></i> Lock'}</button>
+    <button class="btn btn-soft text-xs px-2 py-1" data-quick="visibility">${el.visible ? '<i data-lucide="eye" class="w-3.5 h-3.5"></i> Hide' : '<i data-lucide="eye-off" class="w-3.5 h-3.5"></i> Show'}</button>
+  </div>`;
+
+  // Position & Size
+  html += inspectorGroup('Position & Size', 'move', `
+    <div class="grid grid-cols-2 gap-2">
+      <div><label class="field-label block mb-1">X</label><input type="number" class="input input-num" data-prop="x" value="${round(el.x)}"/></div>
+      <div><label class="field-label block mb-1">Y</label><input type="number" class="input input-num" data-prop="y" value="${round(el.y)}"/></div>
+      <div><label class="field-label block mb-1">Width</label><input type="number" class="input input-num" data-prop="width" value="${round(el.width)}" min="1"/></div>
+      <div><label class="field-label block mb-1">Height</label><input type="number" class="input input-num" data-prop="height" value="${round(el.height)}" min="1"/></div>
+    </div>
+    <div>
+      <label class="field-label block mb-1">Rotation: <span class="text-ink-700 font-mono">${round(el.rotation)}°</span></label>
+      <input type="range" min="-180" max="180" step="1" value="${el.rotation}" data-prop="rotation"/>
+    </div>
+    <div>
+      <label class="field-label block mb-1">Opacity: <span class="text-ink-700 font-mono">${Math.round(el.opacity * 100)}%</span></label>
+      <input type="range" min="0" max="1" step="0.01" value="${el.opacity}" data-prop="opacity"/>
+    </div>
+    <div class="grid grid-cols-4 gap-1">
+      <button class="align-btn" data-align="left" data-tip="Align Left"><i data-lucide="align-horizontal-justify-start" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-align="center-h" data-tip="Align Center H"><i data-lucide="align-horizontal-justify-center" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-align="right" data-tip="Align Right"><i data-lucide="align-horizontal-justify-end" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-align="center-v" data-tip="Align Center V"><i data-lucide="align-vertical-justify-center" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-align="top" data-tip="Align Top"><i data-lucide="align-vertical-justify-start" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-align="bottom" data-tip="Align Bottom"><i data-lucide="align-vertical-justify-end" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-align="center-canvas" data-tip="Center on Canvas"><i data-lucide="target" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-align="flip-h" data-tip="Flip H"><i data-lucide="flip-horizontal" class="w-4 h-4"></i></button>
+    </div>
+  `);
+
+  // Type-specific inspector
+  if (el.type === 'text') html += renderTextInspector(el);
+  if (el.type === 'shape') html += renderShapeInspector(el);
+  if (el.type === 'image') html += renderImageInspector(el);
+  if (el.type === 'icon') html += renderIconInspector(el);
+  if (el.type === 'footer') html += renderFooterInspector(el);
+
+  // Arrange
+  html += inspectorGroup('Arrange', 'layers', `
+    <div class="grid grid-cols-4 gap-1">
+      <button class="align-btn" data-arrange="front" data-tip="Bring to Front"><i data-lucide="bring-to-front" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-arrange="forward" data-tip="Forward"><i data-lucide="chevrons-up" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-arrange="backward" data-tip="Backward"><i data-lucide="chevrons-down" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-arrange="back" data-tip="Send to Back"><i data-lucide="send-to-back" class="w-4 h-4"></i></button>
+    </div>
+    <input type="text" class="input" data-prop="name" value="${esc(el.name || '')}" placeholder="Layer name (optional)"/>
+  `);
+
+  container.innerHTML = html;
+  if (window.lucide) lucide.createIcons();
+  attachInspectorHandlers();
+}
+
+function inspectorGroup(title, icon, body) {
+  return `<div class="insp-group mb-3">
+    <div class="insp-group-head"><i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${title}</div>
+    <div class="insp-group-body">${body}</div>
+  </div>`;
+}
+
+function renderTextInspector(el) {
+  const fonts = ['Inter','Roboto','Montserrat','Poppins','Playfair Display','DM Serif Display','Lora','Bebas Neue','Oswald','Anton','Pacifico','Lobster','Caveat','Space Grotesk'];
+  const fontOptions = fonts.map(f => `<option value="${f}" ${el.fontFamily === f ? 'selected' : ''}>${f}</option>`).join('');
+  return inspectorGroup('Text', 'type', `
+    <textarea class="textarea" data-prop="text" placeholder="Text content">${esc(el.text)}</textarea>
+    <div>
+      <label class="field-label block mb-1">Font Family</label>
+      <select class="select" data-prop="fontFamily">${fontOptions}</select>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+      <div><label class="field-label block mb-1">Size</label><input type="number" class="input input-num" data-prop="fontSize" value="${el.fontSize}" min="6" max="400"/></div>
+      <div><label class="field-label block mb-1">Weight</label>
+        <select class="select" data-prop="fontWeight">
+          <option value="300" ${el.fontWeight==300?'selected':''}>Light</option>
+          <option value="400" ${el.fontWeight==400?'selected':''}>Regular</option>
+          <option value="500" ${el.fontWeight==500?'selected':''}>Medium</option>
+          <option value="600" ${el.fontWeight==600?'selected':''}>Semibold</option>
+          <option value="700" ${el.fontWeight==700?'selected':''}>Bold</option>
+          <option value="800" ${el.fontWeight==800?'selected':''}>Extrabold</option>
+          <option value="900" ${el.fontWeight==900?'selected':''}>Black</option>
+        </select>
+      </div>
+    </div>
+    <div class="seg" style="width:100%;">
+      <button data-prop="fontStyle" data-val="normal" class="${el.fontStyle==='normal'?'active':''}">Italic Off</button>
+      <button data-prop="fontStyle" data-val="italic" class="${el.fontStyle==='italic'?'active':''}">Italic On</button>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+      <div><label class="field-label block mb-1">Line Height</label><input type="number" step="0.05" class="input input-num" data-prop="lineHeight" value="${el.lineHeight}"/></div>
+      <div><label class="field-label block mb-1">Letter Spacing</label><input type="number" step="0.5" class="input input-num" data-prop="letterSpacing" value="${el.letterSpacing}"/></div>
+    </div>
+    <div>
+      <label class="field-label block mb-1">Alignment</label>
+      <div class="seg" style="width:100%;">
+        <button data-prop="textAlign" data-val="left" class="${el.textAlign==='left'?'active':''}"><i data-lucide="align-left" class="w-3.5 h-3.5"></i></button>
+        <button data-prop="textAlign" data-val="center" class="${el.textAlign==='center'?'active':''}"><i data-lucide="align-center" class="w-3.5 h-3.5"></i></button>
+        <button data-prop="textAlign" data-val="right" class="${el.textAlign==='right'?'active':''}"><i data-lucide="align-right" class="w-3.5 h-3.5"></i></button>
+        <button data-prop="textAlign" data-val="justify" class="${el.textAlign==='justify'?'active':''}"><i data-lucide="align-justify" class="w-3.5 h-3.5"></i></button>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-2 items-center">
+      <div><label class="field-label block mb-1">Text Color</label>${colorRow('color', el.color)}</div>
+      <div><label class="field-label block mb-1">Background</label>${colorRow('backgroundColor', el.backgroundColor || 'transparent', true)}</div>
+    </div>
+    <div class="grid grid-cols-4 gap-1">
+      <button class="align-btn" data-text-deco="none" data-tip="No decoration"><i data-lucide="minus" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-text-deco="underline" data-tip="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-text-deco="line-through" data-tip="Strikethrough"><i data-lucide="strikethrough" class="w-4 h-4"></i></button>
+      <button class="align-btn" data-text-deco="uppercase" data-tip="UPPERCASE"><i data-lucide="case-upper" class="w-4 h-4"></i></button>
+    </div>
+    ${swatchPalette('color')}
+  `);
+}
+
+function renderShapeInspector(el) {
+  return inspectorGroup('Shape', 'shapes', `
+    <div>
+      <label class="field-label block mb-1">Shape Type</label>
+      <select class="select" data-prop="shape">
+        <option value="rectangle" ${el.shape==='rectangle'?'selected':''}>Rectangle</option>
+        <option value="circle" ${el.shape==='circle'?'selected':''}>Circle</option>
+        <option value="triangle" ${el.shape==='triangle'?'selected':''}>Triangle</option>
+        <option value="star" ${el.shape==='star'?'selected':''}>Star</option>
+        <option value="polygon" ${el.shape==='polygon'?'selected':''}>Polygon</option>
+        <option value="hexagon" ${el.shape==='hexagon'?'selected':''}>Hexagon</option>
+        <option value="heart" ${el.shape==='heart'?'selected':''}>Heart</option>
+        <option value="line" ${el.shape==='line'?'selected':''}>Line</option>
+        <option value="arrow" ${el.shape==='arrow'?'selected':''}>Arrow</option>
+      </select>
+    </div>
+    ${el.shape === 'rectangle' ? `<div><label class="field-label block mb-1">Corner Radius: <span class="text-ink-700 font-mono">${el.borderRadius}px</span></label><input type="range" min="0" max="200" step="1" value="${el.borderRadius}" data-prop="borderRadius"/></div>` : ''}
+    ${el.shape === 'star' ? `<div><label class="field-label block mb-1">Star Points: <span class="text-ink-700 font-mono">${el.starPoints}</span></label><input type="range" min="3" max="12" step="1" value="${el.starPoints}" data-prop="starPoints"/></div>` : ''}
+    ${el.shape === 'polygon' ? `<div><label class="field-label block mb-1">Sides: <span class="text-ink-700 font-mono">${el.sides}</span></label><input type="range" min="3" max="12" step="1" value="${el.sides}" data-prop="sides"/></div>` : ''}
+    <div>
+      <label class="field-label block mb-1">Fill Type</label>
+      <div class="seg" style="width:100%;">
+        <button data-prop="fillType" data-val="solid" class="${el.fillType==='solid'?'active':''}">Solid</button>
+        <button data-prop="fillType" data-val="gradient" class="${el.fillType==='gradient'?'active':''}">Gradient</button>
+        <button data-prop="fillType" data-val="none" class="${el.fillType==='none'?'active':''}">None</button>
+      </div>
+    </div>
+    ${el.fillType !== 'none' ? `
+      ${el.fillType === 'solid' ? `<div><label class="field-label block mb-1">Fill Color</label>${colorRow('fill', el.fill)}${swatchPalette('fill')}</div>` : ''}
+      ${el.fillType === 'gradient' ? renderGradientRow(el) : ''}
+    ` : ''}
+    <div class="grid grid-cols-2 gap-2 items-center">
+      <div><label class="field-label block mb-1">Stroke</label>${colorRow('stroke', el.stroke)}</div>
+      <div><label class="field-label block mb-1">Width: <span class="text-ink-700 font-mono">${el.strokeWidth}</span></label><input type="range" min="0" max="20" step="0.5" value="${el.strokeWidth}" data-prop="strokeWidth"/></div>
+    </div>
+    <div>
+      <label class="field-label block mb-1">Stroke Style</label>
+      <div class="seg" style="width:100%;">
+        <button data-prop="strokeStyle" data-val="solid" class="${el.strokeStyle==='solid'?'active':''}">Solid</button>
+        <button data-prop="strokeStyle" data-val="dashed" class="${el.strokeStyle==='dashed'?'active':''}">Dashed</button>
+        <button data-prop="strokeStyle" data-val="dotted" class="${el.strokeStyle==='dotted'?'active':''}">Dotted</button>
+      </div>
+    </div>
+    <div>
+      <label class="flex items-center gap-2 text-xs cursor-pointer">
+        <input type="checkbox" data-prop="shadow" ${el.shadow ? 'checked' : ''} class="accent-epsilon-500"/>
+        <span class="font-medium">Drop Shadow</span>
+      </label>
+    </div>
+    ${el.shadow ? `
+      <div class="grid grid-cols-3 gap-2">
+        <div><label class="field-label block mb-1">X</label><input type="number" class="input input-num" data-prop="shadowX" value="${el.shadowX}"/></div>
+        <div><label class="field-label block mb-1">Y</label><input type="number" class="input input-num" data-prop="shadowY" value="${el.shadowY}"/></div>
+        <div><label class="field-label block mb-1">Blur</label><input type="number" class="input input-num" data-prop="shadowBlur" value="${el.shadowBlur}"/></div>
+      </div>
+      <div><label class="field-label block mb-1">Shadow Color</label>${colorRow('shadowColor', el.shadowColor)}</div>
+    ` : ''}
+  `);
+}
+
+function renderGradientRow(el) {
+  if (!el.gradient) el.gradient = { angle: 90, stops: ['#F5C518', '#D9A90E'] };
+  const g = el.gradient;
+  return `<div>
+    <label class="field-label block mb-1">Gradient</label>
+    <div class="grid grid-cols-2 gap-2 items-center">
+      <input type="color" class="color-input" data-grad-stop="0" value="${g.stops[0]}"/>
+      <input type="color" class="color-input" data-grad-stop="1" value="${g.stops[1]}"/>
+    </div>
+    <label class="field-label block mb-1 mt-2">Angle: <span class="text-ink-700 font-mono">${g.angle}°</span></label>
+    <input type="range" min="0" max="360" step="5" value="${g.angle}" data-grad-angle/>
+  </div>`;
+}
+
+function renderImageInspector(el) {
+  return inspectorGroup('Image', 'image', `
+    <div>
+      <label class="field-label block mb-1">Object Fit</label>
+      <div class="seg" style="width:100%;">
+        <button data-prop="fit" data-val="cover" class="${el.fit==='cover'?'active':''}">Cover</button>
+        <button data-prop="fit" data-val="contain" class="${el.fit==='contain'?'active':''}">Contain</button>
+        <button data-prop="fit" data-val="fill" class="${el.fit==='fill'?'active':''}">Fill</button>
+      </div>
+    </div>
+    <div><label class="field-label block mb-1">Corner Radius: <span class="text-ink-700 font-mono">${el.borderRadius}px</span></label><input type="range" min="0" max="200" step="1" value="${el.borderRadius}" data-prop="borderRadius"/></div>
+    <div>
+      <label class="field-label block mb-1">Filters</label>
+      <div class="grid grid-cols-1 gap-2">
+        <div><label class="text-[11px] flex justify-between">Brightness <span class="font-mono">${el.brightness}%</span></label><input type="range" min="0" max="200" value="${el.brightness}" data-prop="brightness"/></div>
+        <div><label class="text-[11px] flex justify-between">Contrast <span class="font-mono">${el.contrast}%</span></label><input type="range" min="0" max="200" value="${el.contrast}" data-prop="contrast"/></div>
+        <div><label class="text-[11px] flex justify-between">Saturate <span class="font-mono">${el.saturate}%</span></label><input type="range" min="0" max="200" value="${el.saturate}" data-prop="saturate"/></div>
+        <div><label class="text-[11px] flex justify-between">Grayscale <span class="font-mono">${el.grayscale}%</span></label><input type="range" min="0" max="100" value="${el.grayscale}" data-prop="grayscale"/></div>
+        <div><label class="text-[11px] flex justify-between">Sepia <span class="font-mono">${el.sepia}%</span></label><input type="range" min="0" max="100" value="${el.sepia}" data-prop="sepia"/></div>
+        <div><label class="text-[11px] flex justify-between">Blur <span class="font-mono">${el.blur}px</span></label><input type="range" min="0" max="20" value="${el.blur}" data-prop="blur"/></div>
+      </div>
+    </div>
+    <button class="btn btn-soft text-xs w-full" data-quick="reset-filters"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Reset Filters</button>
+    <button class="btn btn-soft text-xs w-full" data-quick="replace-image"><i data-lucide="image-plus" class="w-3.5 h-3.5"></i> Replace Image</button>
+  `);
+}
+
+function renderIconInspector(el) {
+  return inspectorGroup('Icon', 'smile', `
+    <div>
+      <label class="field-label block mb-1">Pick Icon</label>
+      <button class="btn btn-soft w-full text-xs" data-quick="pick-icon"><i data-lucide="grid-3x3" class="w-3.5 h-3.5"></i> Browse Icons</button>
+    </div>
+    <div><label class="field-label block mb-1">Color</label>${colorRow('color', el.color)}${swatchPalette('color')}</div>
+    <div><label class="field-label block mb-1">Stroke Width: <span class="text-ink-700 font-mono">${el.strokeWidth}</span></label><input type="range" min="0.5" max="4" step="0.25" value="${el.strokeWidth}" data-prop="strokeWidth"/></div>
+    <div>
+      <label class="flex items-center gap-2 text-xs cursor-pointer">
+        <input type="checkbox" data-prop="fill" ${el.fill ? 'checked' : ''} class="accent-epsilon-500"/>
+        <span class="font-medium">Fill Icon</span>
+      </label>
+    </div>
+    <div><label class="field-label block mb-1">Background</label>${colorRow('backgroundColor', el.backgroundColor || 'transparent', true)}</div>
+    <div><label class="field-label block mb-1">Corner Radius: <span class="text-ink-700 font-mono">${el.borderRadius}px</span></label><input type="range" min="0" max="100" step="1" value="${el.borderRadius}" data-prop="borderRadius"/></div>
+  `);
+}
+
+function renderFooterInspector(el) {
+  return inspectorGroup('Footer', 'panel-bottom', `
+    <div>
+      <label class="field-label block mb-1">Layout</label>
+      <select class="select" data-prop="layout">
+        <option value="simple" ${el.layout==='simple'?'selected':''}>Simple</option>
+        <option value="columns" ${el.layout==='columns'?'selected':''}>Columns</option>
+        <option value="brand" ${el.layout==='brand'?'selected':''}>Brand Block</option>
+        <option value="social" ${el.layout==='social'?'selected':''}>With Social</option>
+      </select>
+    </div>
+    <div><label class="field-label block mb-1">Brand Name</label><input type="text" class="input" data-prop="brandName" value="${esc(el.brandName)}"/></div>
+    <div><label class="field-label block mb-1">Tagline</label><input type="text" class="input" data-prop="tagline" value="${esc(el.tagline)}"/></div>
+    <div><label class="field-label block mb-1">Contact</label><input type="text" class="input" data-prop="contact" value="${esc(el.contact)}"/></div>
+    <div><label class="field-label block mb-1">Social</label><input type="text" class="input" data-prop="social" value="${esc(el.social)}"/></div>
+    <div class="grid grid-cols-2 gap-2 items-center">
+      <div><label class="field-label block mb-1">BG</label>${colorRow('bgColor', el.bgColor)}</div>
+      <div><label class="field-label block mb-1">Text</label>${colorRow('textColor', el.textColor)}</div>
+    </div>
+    <div><label class="field-label block mb-1">Accent</label>${colorRow('accentColor', el.accentColor)}</div>
+    <div><label class="field-label block mb-1">Font Size: <span class="text-ink-700 font-mono">${el.fontSize}</span></label><input type="range" min="8" max="32" step="1" value="${el.fontSize}" data-prop="fontSize"/></div>
+  `);
+}
+
+function colorRow(prop, value, allowTransparent = false) {
+  const v = value || (allowTransparent ? 'transparent' : '#000000');
+  const isTransparent = v === 'transparent' || !v;
+  const colorVal = isTransparent ? '#FFFFFF' : v;
+  let html = `<div class="flex items-center gap-1.5">
+    <input type="color" class="color-input" data-prop="${prop}" value="${colorVal}"/>
+    <input type="text" class="input input-num flex-1" data-prop-text="${prop}" value="${v}" style="font-size:11px;"/>
+  `;
+  if (allowTransparent) {
+    html += `<button class="btn btn-soft text-[10px] px-1.5 py-1" data-transparent="${prop}">∅</button>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+const PALETTE = [
+  '#1F1F1C', '#FFFFFF', '#F5C518', '#FFDD3A', '#FFE970',
+  '#D9A90E', '#A87E08', '#3D2F03', '#FF6B6B', '#B83A3A',
+  '#1F7A4D', '#2DD4BF', '#3B82F6', '#6366F1', '#A855F7',
+  '#EC4899', '#F97316', '#84CC16', '#14B8A6', '#0EA5E9',
+  '#000000', '#66665D', '#C9C9BD', '#F4F4EE'
+];
+function swatchPalette(prop) {
+  return `<div class="flex flex-wrap gap-1.5 mt-1">
+    ${PALETTE.map(c => `<button class="swatch" style="background:${c};" data-swatch="${prop}" data-color="${c}" title="${c}"></button>`).join('')}
+  </div>`;
+}
+
+function attachInspectorHandlers() {
+  // numeric/text inputs
+  $$('#inspectorContent [data-prop]').forEach(input => {
+    const evt = input.tagName === 'SELECT' ? 'change' : input.type === 'range' || input.type === 'checkbox' ? 'input' : 'input';
+    input.addEventListener(evt, (e) => {
+      const el = selectedEl();
+      if (!el) return;
+      const prop = input.dataset.prop;
+      let val;
+      if (input.type === 'checkbox') val = input.checked;
+      else if (input.type === 'number' || input.type === 'range') val = parseFloat(input.value);
+      else val = input.value;
+      el[prop] = val;
+      // For text input we don't save history every keystroke
+      if (input.tagName === 'TEXTAREA' || input.tagName === 'INPUT' && input.type === 'text') {
+        // throttle history save
+        if (!input._histTimer) {
+          input._histTimer = setTimeout(() => { saveHistory(); input._histTimer = null; }, 800);
+        }
+        renderCanvas();
+      } else {
+        saveHistory();
+        renderCanvas();
+        // for range, re-render labels only
+        if (input.type === 'range') {
+          // update label only
+          const label = input.previousElementSibling;
+          if (label && label.tagName === 'LABEL') {
+            const span = label.querySelector('span');
+            if (span) {
+              if (prop === 'opacity') span.textContent = Math.round(val * 100) + '%';
+              else if (prop === 'rotation') span.textContent = round(val) + '°';
+              else if (prop === 'fontSize' || prop === 'borderRadius' || prop === 'strokeWidth') span.textContent = val;
+              else span.textContent = val;
+            }
+          }
+        }
+      }
+    });
+  });
+
+  // text/color hex input
+  $$('#inspectorContent [data-prop-text]').forEach(input => {
+    input.addEventListener('change', (e) => {
+      const el = selectedEl();
+      if (!el) return;
+      const prop = input.dataset.propText;
+      const v = input.value.trim();
+      if (v === 'transparent' || v === '') {
+        el[prop] = 'transparent';
+      } else if (/^(#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})|rgba?\([^)]+\))$/i.test(v)) {
+        el[prop] = v;
+      } else {
+        // try to prepend #
+        if (/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)) el[prop] = '#' + v;
+        else { input.value = el[prop] || ''; return; }
+      }
+      saveHistory();
+      renderCanvas();
+      renderInspector();
+    });
+  });
+
+  // segmented buttons
+  $$('#inspectorContent .seg button[data-prop]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const el = selectedEl();
+      if (!el) return;
+      el[btn.dataset.prop] = btn.dataset.val;
+      saveHistory();
+      renderCanvas();
+      renderInspector();
+    });
+  });
+
+  // swatches
+  $$('#inspectorContent [data-swatch]').forEach(s => {
+    s.addEventListener('click', () => {
+      const el = selectedEl();
+      if (!el) return;
+      el[s.dataset.swatch] = s.dataset.color;
+      saveHistory();
+      renderCanvas();
+      renderInspector();
+    });
+  });
+
+  // transparent button
+  $$('#inspectorContent [data-transparent]').forEach(b => {
+    b.addEventListener('click', () => {
+      const el = selectedEl();
+      if (!el) return;
+      el[b.dataset.transparent] = 'transparent';
+      saveHistory();
+      renderCanvas();
+      renderInspector();
+    });
+  });
+
+  // gradient stops
+  $$('#inspectorContent [data-grad-stop]').forEach(input => {
+    input.addEventListener('input', () => {
+      const el = selectedEl();
+      if (!el || !el.gradient) return;
+      el.gradient.stops[parseInt(input.dataset.gradStop)] = input.value;
+      renderCanvas();
+    });
+    input.addEventListener('change', () => saveHistory());
+  });
+  $$('#inspectorContent [data-grad-angle]').forEach(input => {
+    input.addEventListener('input', () => {
+      const el = selectedEl();
+      if (!el || !el.gradient) return;
+      el.gradient.angle = parseInt(input.value);
+      const label = input.previousElementSibling;
+      if (label && label.tagName === 'LABEL') {
+        const span = label.querySelector('span');
+        if (span) span.textContent = el.gradient.angle + '°';
+      }
+      renderCanvas();
+    });
+    input.addEventListener('change', () => saveHistory());
+  });
+
+  // quick actions
+  $$('#inspectorContent [data-quick]').forEach(b => {
+    b.addEventListener('click', () => {
+      const el = selectedEl();
+      if (!el) return;
+      const action = b.dataset.quick;
+      if (action === 'duplicate') duplicateElement(el.id);
+      else if (action === 'delete') deleteElement(el.id);
+      else if (action === 'lock') updateElement(el.id, { locked: !el.locked });
+      else if (action === 'visibility') updateElement(el.id, { visible: !el.visible });
+      else if (action === 'reset-filters') updateElement(el.id, { brightness:100, contrast:100, saturate:100, grayscale:0, sepia:0, blur:0, invert:0 });
+      else if (action === 'replace-image') triggerImageUpload((src) => updateElement(el.id, { src }));
+      else if (action === 'pick-icon') openIconPicker((name) => updateElement(el.id, { iconName: name }));
+    });
+  });
+
+  // align buttons
+  $$('#inspectorContent [data-align]').forEach(b => {
+    b.addEventListener('click', () => alignElement(b.dataset.align));
+  });
+  // arrange buttons
+  $$('#inspectorContent [data-arrange]').forEach(b => {
+    b.addEventListener('click', () => reorderElement(selectedEl().id, b.dataset.arrange));
+  });
+  // text decoration
+  $$('#inspectorContent [data-text-deco]').forEach(b => {
+    b.addEventListener('click', () => {
+      const el = selectedEl();
+      if (!el) return;
+      const deco = b.dataset.textDeco;
+      if (deco === 'uppercase') {
+        el.text = (el.text || '').toUpperCase();
+      } else {
+        el.textDecoration = deco;
+      }
+      saveHistory();
+      renderCanvas();
+      renderInspector();
+    });
+  });
+}
+
+function alignElement(kind) {
+  const el = selectedEl();
+  if (!el) return;
+  const cw = state.canvas.width, ch = state.canvas.height;
+  switch (kind) {
+    case 'left':       el.x = 0; break;
+    case 'right':      el.x = cw - el.width; break;
+    case 'center-h':   el.x = (cw - el.width) / 2; break;
+    case 'center-v':   el.y = (ch - el.height) / 2; break;
+    case 'top':        el.y = 0; break;
+    case 'bottom':     el.y = ch - el.height; break;
+    case 'center-canvas': el.x = (cw - el.width) / 2; el.y = (ch - el.height) / 2; break;
+    case 'flip-h':     el.rotation = (el.rotation || 0) + 180; break;
+  }
+  saveHistory();
+  renderCanvas();
+  renderInspector();
+}
+
+/* ---------- Layers Panel ---------- */
+function renderLayers() {
+  if (state.currentLeftTab !== 'layers') return;
+  const c = $('#leftPanelContent');
+  if (state.elements.length === 0) {
+    c.innerHTML = `<div class="empty-state">
+      <i data-lucide="layers-2" class="w-10 h-10 mx-auto mb-3 text-ink-200"></i>
+      <div class="font-medium text-ink-400 text-sm mb-1">No layers yet</div>
+      <div class="text-xs">Add elements to see them here.</div>
+    </div>`;
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+  // render top-down (last item = top of stack)
+  const reversed = [...state.elements].reverse();
+  c.innerHTML = `<div class="text-[11px] text-ink-400 mb-2 px-1 flex items-center justify-between">
+    <span>${state.elements.length} layer${state.elements.length === 1 ? '' : 's'}</span>
+    <button class="btn btn-ghost text-[10px] px-1.5 py-0.5" data-tip="Clear all" id="clearAllBtn"><i data-lucide="trash" class="w-3 h-3"></i> Clear</button>
+  </div>` + reversed.map(el => {
+    const active = el.id === state.selectedId;
+    const name = el.name || defaultLayerName(el);
+    const thumb = layerThumb(el);
+    return `<div class="layer-row ${active ? 'active' : ''}" data-layer-id="${el.id}">
+      <div class="layer-thumb">${thumb}</div>
+      <div class="flex-1 min-w-0">
+        <div class="truncate font-medium ${active ? 'text-epsilon-700' : 'text-ink-700'}">${esc(name)}</div>
+        <div class="text-[10px] text-ink-400 uppercase tracking-wider">${el.type}</div>
+      </div>
+      <button class="btn btn-ghost btn-icon" data-tip="${el.visible ? 'Hide' : 'Show'}" data-layer-act="vis" data-id="${el.id}">
+        <i data-lucide="${el.visible ? 'eye' : 'eye-off'}" class="w-3.5 h-3.5"></i>
+      </button>
+      <button class="btn btn-ghost btn-icon" data-tip="${el.locked ? 'Unlock' : 'Lock'}" data-layer-act="lock" data-id="${el.id}">
+        <i data-lucide="${el.locked ? 'lock' : 'unlock'}" class="w-3.5 h-3.5"></i>
+      </button>
+      <button class="btn btn-ghost btn-icon" data-tip="Duplicate" data-layer-act="dup" data-id="${el.id}">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+      </button>
+      <button class="btn btn-ghost btn-icon" data-tip="Delete" data-layer-act="del" data-id="${el.id}">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-500"></i>
+      </button>
+    </div>`;
+  }).join('');
+
+  // bind
+  $$('#leftPanelContent [data-layer-id]').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('[data-layer-act]')) return;
+      state.selectedId = row.dataset.layerId;
+      renderAll();
+    });
+  });
+  $$('#leftPanelContent [data-layer-act]').forEach(b => {
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = b.dataset.id;
+      const act = b.dataset.layerAct;
+      const el = getElement(id);
+      if (!el) return;
+      if (act === 'vis') updateElement(id, { visible: !el.visible });
+      else if (act === 'lock') updateElement(id, { locked: !el.locked });
+      else if (act === 'dup') duplicateElement(id);
+      else if (act === 'del') deleteElement(id);
+    });
+  });
+  const clearBtn = $('#clearAllBtn');
+  if (clearBtn) clearBtn.addEventListener('click', () => {
+    if (confirm('Clear all elements?')) {
+      state.elements = [];
+      state.selectedId = null;
+      saveHistory();
+      renderAll();
+    }
+  });
+  if (window.lucide) lucide.createIcons();
+}
+
+function defaultLayerName(el) {
+  if (el.type === 'text') return (el.text || '').slice(0, 24) || 'Text';
+  if (el.type === 'shape') return (el.shape || 'shape').charAt(0).toUpperCase() + (el.shape || 'shape').slice(1);
+  if (el.type === 'image') return 'Image';
+  if (el.type === 'icon') return 'Icon: ' + (el.iconName || 'star');
+  if (el.type === 'footer') return 'Footer: ' + (el.layout || 'simple');
+  return el.type;
+}
+
+function layerThumb(el) {
+  if (el.type === 'text') return `<i data-lucide="type" class="w-4 h-4"></i>`;
+  if (el.type === 'shape') return `<div style="width:20px;height:20px;background:${el.fill || '#F5C518'};border-radius:${el.shape === 'circle' ? '50%' : '4px'};"></div>`;
+  if (el.type === 'image') return el.src ? `<img src="${el.src}" style="width:20px;height:20px;object-fit:cover;border-radius:3px;"/>` : `<i data-lucide="image" class="w-4 h-4"></i>`;
+  if (el.type === 'icon') return `<i data-lucide="${el.iconName || 'star'}" class="w-4 h-4" style="color:${el.color || '#F5C518'}"></i>`;
+  if (el.type === 'footer') return `<i data-lucide="panel-bottom" class="w-4 h-4"></i>`;
+  return '';
+}
+
+/* ---------- Left Panel Renderer ---------- */
+const LEFT_TAB_TITLES = {
+  templates: { title: 'Templates', icon: 'layout-template' },
+  shapes:    { title: 'Shapes', icon: 'shapes' },
+  text:      { title: 'Text', icon: 'type' },
+  icons:     { title: 'Icons', icon: 'smile' },
+  images:    { title: 'Images', icon: 'image' },
+  footers:   { title: 'Footers', icon: 'panel-bottom' },
+  backgrounds: { title: 'Backgrounds', icon: 'paint-bucket' },
+  uploads:   { title: 'My Uploads', icon: 'upload-cloud' },
+  layers:    { title: 'Layers', icon: 'layers-2' },
+};
+
+function setLeftTab(tab) {
+  state.currentLeftTab = tab;
+  $$('.left-tab').forEach(t => t.classList.toggle('active', t.dataset.leftTab === tab));
+  const info = LEFT_TAB_TITLES[tab];
+  $('#leftPanelTitle').innerHTML = `<i data-lucide="${info.icon}" class="w-4 h-4 text-epsilon-600"></i><span>${info.title}</span>`;
+  if (window.lucide) lucide.createIcons();
+  renderLeftPanel();
+}
+
+function renderLeftPanel() {
+  const tab = state.currentLeftTab;
+  if (tab === 'layers') { renderLayers(); return; }
+  const c = $('#leftPanelContent');
+  switch (tab) {
+    case 'templates':   c.innerHTML = renderTemplatesPanel(); break;
+    case 'shapes':      c.innerHTML = renderShapesPanel(); break;
+    case 'text':        c.innerHTML = renderTextPanel(); break;
+    case 'icons':       c.innerHTML = renderIconsPanel(); break;
+    case 'images':      c.innerHTML = renderImagesPanel(); break;
+    case 'footers':     c.innerHTML = renderFootersPanel(); break;
+    case 'backgrounds': c.innerHTML = renderBackgroundsPanel(); break;
+    case 'uploads':     c.innerHTML = renderUploadsPanel(); break;
+  }
+  if (window.lucide) lucide.createIcons();
+  bindLeftPanelHandlers();
+}
+
+/* ---------- Templates Panel ---------- */
+const TEMPLATES = [
+  {
+    id: 'blank', name: 'Blank', category: 'Basic',
+    build: () => ({ elements: [], canvas: { width: 800, height: 1100, background: '#FFFFFF', backgroundType: 'solid' } })
+  },
+  {
+    id: 'event', name: 'Event Flyer', category: 'Marketing',
+    build: () => ({
+      canvas: { width: 800, height: 1100, background: '#FFFDF2', backgroundType: 'solid' },
+      elements: [
+        { type: 'shape', shape: 'rectangle', x: 0, y: 0, width: 800, height: 220, fill: '#F5C518', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Header band' },
+        { type: 'text', text: 'SUMMER\nFEST', x: 80, y: 70, width: 400, height: 130, fontFamily: 'Anton', fontSize: 96, fontWeight: 900, color: '#1F1F1C', textAlign: 'left', lineHeight: 1, letterSpacing: -2, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Title' },
+        { type: 'text', text: 'JULY 27 · CENTRAL PARK · 5PM', x: 80, y: 250, width: 640, height: 30, fontFamily: 'Bebas Neue', fontSize: 24, fontWeight: 400, color: '#A87E08', textAlign: 'left', letterSpacing: 4, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Subtitle' },
+        { type: 'shape', shape: 'circle', x: 580, y: 380, width: 160, height: 160, fill: '#1F1F1C', fillType: 'solid', stroke: '#F5C518', strokeWidth: 4, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Circle' },
+        { type: 'text', text: 'LIVE\nMUSIC', x: 600, y: 415, width: 130, height: 90, fontFamily: 'Oswald', fontSize: 32, fontWeight: 700, color: '#F5C518', textAlign: 'center', lineHeight: 0.95, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Circle label' },
+        { type: 'text', text: 'Featuring\nThe Sunsets\nDJ Marlow\n& The Wild Ones', x: 80, y: 460, width: 400, height: 200, fontFamily: 'Playfair Display', fontSize: 36, fontWeight: 700, color: '#1F1F1C', textAlign: 'left', lineHeight: 1.2, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Lineup' },
+        { type: 'footer', layout: 'simple', x: 0, y: 1040, width: 800, height: 60, bgColor: '#1F1F1C', textColor: '#FFFFFF', accentColor: '#F5C518', brandName: 'EPSILON EVENTS', tagline: 'epsilonevents.com', fontSize: 14, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Footer' },
+      ]
+    })
+  },
+  {
+    id: 'sale', name: 'Sale Poster', category: 'Marketing',
+    build: () => ({
+      canvas: { width: 800, height: 1100, background: '#1F1F1C', backgroundType: 'solid' },
+      elements: [
+        { type: 'text', text: 'BIG\nSALE', x: 80, y: 60, width: 640, height: 280, fontFamily: 'Anton', fontSize: 200, fontWeight: 900, color: '#F5C518', textAlign: 'left', lineHeight: 0.9, letterSpacing: -6, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Hero' },
+        { type: 'shape', shape: 'rectangle', x: 80, y: 380, width: 280, height: 8, fill: '#F5C518', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Divider' },
+        { type: 'text', text: 'UP TO 50% OFF\nEVERYTHING IN STORE', x: 80, y: 420, width: 640, height: 100, fontFamily: 'Inter', fontSize: 32, fontWeight: 600, color: '#FFFFFF', textAlign: 'left', lineHeight: 1.2, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Offer' },
+        { type: 'text', text: 'THIS WEEKEND ONLY\nFRIDAY — SUNDAY', x: 80, y: 580, width: 640, height: 60, fontFamily: 'Bebas Neue', fontSize: 36, fontWeight: 400, color: '#F5C518', textAlign: 'left', letterSpacing: 4, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Dates' },
+        { type: 'icon', iconName: 'tag', x: 540, y: 720, width: 180, height: 180, color: '#F5C518', strokeWidth: 1.5, fill: false, backgroundColor: 'transparent', borderRadius: 0, rotation: -15, opacity: 0.9, locked: false, visible: true, name: 'Tag icon' },
+        { type: 'footer', layout: 'simple', x: 0, y: 1020, width: 800, height: 80, bgColor: '#F5C518', textColor: '#1F1F1C', accentColor: '#1F1F1C', brandName: 'EPSILON STORE', tagline: 'epsilonstore.com', fontSize: 16, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Footer' },
+      ]
+    })
+  },
+  {
+    id: 'quote', name: 'Quote Poster', category: 'Inspiration',
+    build: () => ({
+      canvas: { width: 800, height: 1000, background: '#FFFDF2', backgroundType: 'solid' },
+      elements: [
+        { type: 'text', text: '"', x: 60, y: 40, width: 200, height: 200, fontFamily: 'Playfair Display', fontSize: 280, fontWeight: 900, color: '#F5C518', textAlign: 'left', lineHeight: 1, rotation: 0, opacity: 0.6, locked: false, visible: true, name: 'Quote mark' },
+        { type: 'text', text: 'Design is\nintelligence\nmade visible.', x: 80, y: 320, width: 640, height: 320, fontFamily: 'Playfair Display', fontSize: 64, fontWeight: 700, fontStyle: 'italic', color: '#1F1F1C', textAlign: 'left', lineHeight: 1.1, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Quote' },
+        { type: 'shape', shape: 'line', x: 80, y: 700, width: 120, height: 4, stroke: '#1F1F1C', strokeWidth: 4, fill: '#1F1F1C', fillType: 'solid', rotation: 0, opacity: 1, locked: false, visible: true, name: 'Divider' },
+        { type: 'text', text: 'ALINA WHEELER', x: 80, y: 740, width: 400, height: 30, fontFamily: 'Bebas Neue', fontSize: 24, fontWeight: 400, color: '#A87E08', textAlign: 'left', letterSpacing: 4, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Author' },
+        { type: 'footer', layout: 'simple', x: 0, y: 940, width: 800, height: 60, bgColor: '#1F1F1C', textColor: '#FFFFFF', accentColor: '#F5C518', brandName: 'EPSILON EDITS', tagline: 'Daily Inspiration', fontSize: 14, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Footer' },
+      ]
+    })
+  },
+  {
+    id: 'instagram', name: 'Instagram Promo', category: 'Social',
+    build: () => ({
+      canvas: { width: 1080, height: 1080, background: '#FFFFFF', backgroundType: 'solid' },
+      elements: [
+        { type: 'shape', shape: 'circle', x: 80, y: 80, width: 920, height: 920, fill: '#F5C518', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Big circle' },
+        { type: 'shape', shape: 'circle', x: 180, y: 180, width: 720, height: 720, fill: '#FFFFFF', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Inner circle' },
+        { type: 'text', text: 'NEW\nDROP', x: 290, y: 360, width: 500, height: 200, fontFamily: 'Bebas Neue', fontSize: 120, fontWeight: 400, color: '#1F1F1C', textAlign: 'center', lineHeight: 0.95, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Headline' },
+        { type: 'text', text: 'TAP TO SHOP', x: 290, y: 580, width: 500, height: 40, fontFamily: 'Inter', fontSize: 24, fontWeight: 600, color: '#A87E08', textAlign: 'center', letterSpacing: 4, rotation: 0, opacity: 1, locked: false, visible: true, name: 'CTA' },
+        { type: 'icon', iconName: 'arrow-right', x: 490, y: 660, width: 100, height: 100, color: '#1F1F1C', strokeWidth: 2, fill: false, backgroundColor: 'transparent', borderRadius: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Arrow' },
+      ]
+    })
+  },
+  {
+    id: 'business', name: 'Business Card', category: 'Print',
+    build: () => ({
+      canvas: { width: 1050, height: 600, background: '#FFFFFF', backgroundType: 'solid' },
+      elements: [
+        { type: 'shape', shape: 'rectangle', x: 0, y: 0, width: 350, height: 600, fill: '#1F1F1C', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Left band' },
+        { type: 'shape', shape: 'circle', x: 100, y: 220, width: 150, height: 150, fill: '#F5C518', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Logo bg' },
+        { type: 'text', text: 'E', x: 130, y: 245, width: 90, height: 100, fontFamily: 'Playfair Display', fontSize: 100, fontWeight: 900, color: '#1F1F1C', textAlign: 'center', lineHeight: 1, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Logo letter' },
+        { type: 'text', text: 'EMMA STONE', x: 420, y: 180, width: 580, height: 60, fontFamily: 'Inter', fontSize: 36, fontWeight: 700, color: '#1F1F1C', textAlign: 'left', letterSpacing: -0.5, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Name' },
+        { type: 'text', text: 'Creative Director', x: 420, y: 240, width: 580, height: 30, fontFamily: 'Inter', fontSize: 18, fontWeight: 400, color: '#A87E08', textAlign: 'left', letterSpacing: 2, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Title' },
+        { type: 'shape', shape: 'line', x: 420, y: 290, width: 80, height: 2, stroke: '#1F1F1C', strokeWidth: 2, fill: '#1F1F1C', fillType: 'solid', rotation: 0, opacity: 1, locked: false, visible: true, name: 'Divider' },
+        { type: 'text', text: 'emma@epsilonedits.com\n+1 (555) 012-3456\nepsilonedits.com', x: 420, y: 320, width: 580, height: 120, fontFamily: 'Inter', fontSize: 16, fontWeight: 400, color: '#4A4A43', textAlign: 'left', lineHeight: 1.7, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Contact' },
+      ]
+    })
+  },
+  {
+    id: 'menu', name: 'Menu Card', category: 'Print',
+    build: () => ({
+      canvas: { width: 800, height: 1000, background: '#FFFDF2', backgroundType: 'solid' },
+      elements: [
+        { type: 'text', text: 'MENU', x: 100, y: 80, width: 600, height: 100, fontFamily: 'Playfair Display', fontSize: 80, fontWeight: 900, color: '#A87E08', textAlign: 'center', letterSpacing: 8, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Title' },
+        { type: 'shape', shape: 'line', x: 200, y: 200, width: 400, height: 2, stroke: '#A87E08', strokeWidth: 2, fill: '#A87E08', fillType: 'solid', rotation: 0, opacity: 1, locked: false, visible: true, name: 'Divider' },
+        { type: 'text', text: 'STARTERS\n\nHeirloom Tomato Salad · 12\nBeet Carpaccio · 14\nCharred Octopus · 18\n\nMAIN COURSE\n\nWood Fired Ribeye · 38\nSaffron Risotto · 24\nPan Seared Cod · 29\n\nDESSERTS\n\nVanilla Crème Brûlée · 11\nDark Chocolate Tart · 13', x: 100, y: 240, width: 600, height: 600, fontFamily: 'Playfair Display', fontSize: 22, fontWeight: 400, color: '#1F1F1C', textAlign: 'center', lineHeight: 1.6, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Menu' },
+        { type: 'footer', layout: 'simple', x: 0, y: 940, width: 800, height: 60, bgColor: '#1F1F1C', textColor: '#FFFFFF', accentColor: '#F5C518', brandName: 'LA MAISON', tagline: 'est. 1987', fontSize: 14, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Footer' },
+      ]
+    })
+  },
+  {
+    id: 'minimal', name: 'Minimal Hero', category: 'Modern',
+    build: () => ({
+      canvas: { width: 1200, height: 800, background: '#FFFFFF', backgroundType: 'solid' },
+      elements: [
+        { type: 'text', text: 'LESS,\nBUT BETTER.', x: 80, y: 200, width: 800, height: 280, fontFamily: 'Inter', fontSize: 110, fontWeight: 800, color: '#1F1F1C', textAlign: 'left', lineHeight: 0.95, letterSpacing: -3, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Hero' },
+        { type: 'shape', shape: 'rectangle', x: 80, y: 520, width: 60, height: 6, fill: '#F5C518', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Accent' },
+        { type: 'text', text: 'We build tools that respect your time,\nyour eyes, and your craft.', x: 80, y: 560, width: 600, height: 80, fontFamily: 'Inter', fontSize: 22, fontWeight: 400, color: '#66665D', textAlign: 'left', lineHeight: 1.4, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Sub' },
+        { type: 'text', text: 'EPSILON EDITS', x: 80, y: 80, width: 400, height: 30, fontFamily: 'Inter', fontSize: 14, fontWeight: 700, color: '#A87E08', textAlign: 'left', letterSpacing: 4, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Brand' },
+        { type: 'icon', iconName: 'arrow-up-right', x: 1020, y: 660, width: 80, height: 80, color: '#1F1F1C', strokeWidth: 2, fill: false, backgroundColor: '#F5C518', borderRadius: 40, rotation: 0, opacity: 1, locked: false, visible: true, name: 'CTA' },
+      ]
+    })
+  },
+  {
+    id: 'gradient', name: 'Gradient Glow', category: 'Modern',
+    build: () => ({
+      canvas: { width: 1080, height: 1080, background: '#1F1F1C', backgroundType: 'gradient', gradient: { angle: 135, stops: ['#1F1F1C', '#3D2F03'] } },
+      elements: [
+        { type: 'shape', shape: 'circle', x: 240, y: 240, width: 600, height: 600, fill: '#F5C518', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: 0, opacity: 0.18, locked: false, visible: true, name: 'Glow' },
+        { type: 'text', text: 'GLOW', x: 290, y: 460, width: 500, height: 160, fontFamily: 'Anton', fontSize: 160, fontWeight: 900, color: '#FFFFFF', textAlign: 'center', lineHeight: 1, letterSpacing: -2, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Title' },
+        { type: 'text', text: 'INNER LIGHT · OUTER CALM', x: 290, y: 640, width: 500, height: 30, fontFamily: 'Bebas Neue', fontSize: 22, fontWeight: 400, color: '#F5C518', textAlign: 'center', letterSpacing: 6, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Sub' },
+        { type: 'icon', iconName: 'sun', x: 490, y: 320, width: 100, height: 100, color: '#F5C518', strokeWidth: 1, fill: false, backgroundColor: 'transparent', borderRadius: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Sun' },
+      ]
+    })
+  },
+  {
+    id: 'polaroid', name: 'Polaroid Frame', category: 'Photo',
+    build: () => ({
+      canvas: { width: 800, height: 1000, background: '#F4F4EE', backgroundType: 'solid' },
+      elements: [
+        { type: 'shape', shape: 'rectangle', x: 140, y: 80, width: 520, height: 600, fill: '#FFFFFF', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: -3, opacity: 1, locked: false, visible: true, name: 'Polaroid', borderRadius: 0, shadow: true, shadowColor: 'rgba(0,0,0,0.15)', shadowBlur: 30, shadowX: 0, shadowY: 12 },
+        { type: 'shape', shape: 'rectangle', x: 170, y: 110, width: 460, height: 460, fill: '#F5C518', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: -3, opacity: 1, locked: false, visible: true, name: 'Photo bg', borderRadius: 0 },
+        { type: 'icon', iconName: 'image', x: 320, y: 280, width: 160, height: 160, color: '#1F1F1C', strokeWidth: 1, fill: false, backgroundColor: 'transparent', borderRadius: 0, rotation: -3, opacity: 0.3, locked: false, visible: true, name: 'Image placeholder' },
+        { type: 'text', text: 'summer of \'24', x: 200, y: 615, width: 400, height: 40, fontFamily: 'Caveat', fontSize: 36, fontWeight: 700, color: '#1F1F1C', textAlign: 'center', rotation: -3, opacity: 1, locked: false, visible: true, name: 'Caption' },
+        { type: 'text', text: 'POLAROID\nMEMORIES', x: 200, y: 760, width: 400, height: 120, fontFamily: 'Bebas Neue', fontSize: 56, fontWeight: 400, color: '#1F1F1C', textAlign: 'center', lineHeight: 1, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Title' },
+      ]
+    })
+  },
+  {
+    id: 'tutorial', name: 'Tutorial Card', category: 'Education',
+    build: () => ({
+      canvas: { width: 1080, height: 1080, background: '#FFFDF2', backgroundType: 'solid' },
+      elements: [
+        { type: 'shape', shape: 'rectangle', x: 80, y: 80, width: 920, height: 920, fill: '#FFFFFF', fillType: 'solid', stroke: '#ECECE5', strokeWidth: 1, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Card', borderRadius: 24, shadow: true, shadowColor: 'rgba(0,0,0,0.06)', shadowBlur: 20, shadowX: 0, shadowY: 8 },
+        { type: 'shape', shape: 'rectangle', x: 140, y: 140, width: 120, height: 36, fill: '#F5C518', fillType: 'solid', stroke: '#000', strokeWidth: 0, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Badge', borderRadius: 999 },
+        { type: 'text', text: 'TIP 04', x: 140, y: 146, width: 120, height: 24, fontFamily: 'Inter', fontSize: 14, fontWeight: 700, color: '#1F1F1C', textAlign: 'center', letterSpacing: 2, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Badge text' },
+        { type: 'text', text: 'Use white space\nas a design element,\nnot as empty space.', x: 140, y: 260, width: 800, height: 260, fontFamily: 'Playfair Display', fontSize: 56, fontWeight: 700, fontStyle: 'italic', color: '#1F1F1C', textAlign: 'left', lineHeight: 1.1, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Tip' },
+        { type: 'shape', shape: 'line', x: 140, y: 600, width: 100, height: 4, stroke: '#F5C518', strokeWidth: 4, fill: '#F5C518', fillType: 'solid', rotation: 0, opacity: 1, locked: false, visible: true, name: 'Accent' },
+        { type: 'text', text: 'Design is fundamentally about choices.\nEvery empty area on the canvas is a\ndeliberate choice — embrace restraint.', x: 140, y: 640, width: 800, height: 120, fontFamily: 'Inter', fontSize: 22, fontWeight: 400, color: '#4A4A43', textAlign: 'left', lineHeight: 1.5, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Body' },
+        { type: 'footer', layout: 'simple', x: 140, y: 920, width: 800, height: 40, bgColor: 'transparent', textColor: '#A87E08', accentColor: '#F5C518', brandName: 'EPSILON EDITS', tagline: 'Design School', fontSize: 12, rotation: 0, opacity: 1, locked: false, visible: true, name: 'Footer' },
+      ]
+    })
+  },
+];
+
+function renderTemplatesPanel() {
+  const categories = {};
+  TEMPLATES.forEach(t => { (categories[t.category] = categories[t.category] || []).push(t); });
+  let html = `<div class="text-[11px] text-ink-400 mb-2 px-1">Click a template to load it. Your current design will be replaced.</div>`;
+  Object.entries(categories).forEach(([cat, list]) => {
+    html += `<div class="section-title">${esc(cat)}</div>`;
+    html += `<div class="grid grid-cols-2 gap-2 mb-3">`;
+    list.forEach(t => {
+      html += `<div class="tpl-card" data-template="${t.id}">
+        <div class="tpl-preview">${templatePreviewSVG(t)}</div>
+        <div class="px-2 py-1.5 flex items-center justify-between">
+          <span class="text-[11px] font-medium">${esc(t.name)}</span>
+          <i data-lucide="plus" class="w-3 h-3 text-epsilon-600"></i>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  return html;
+}
+
+function templatePreviewSVG(t) {
+  // simple visual previews for templates
+  const previews = {
+    blank: `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#8C8C81;font-size:10px;">Blank</div>`,
+    event: `<div style="position:absolute;inset:0;"><div style="position:absolute;top:0;left:0;right:0;height:28%;background:#F5C518;"></div><div style="position:absolute;top:8%;left:10%;width:50%;height:14%;background:#1F1F1C;border-radius:2px;"></div><div style="position:absolute;top:62%;left:60%;width:22%;height:22%;background:#1F1F1C;border-radius:50%;"></div></div>`,
+    sale: `<div style="position:absolute;inset:0;background:#1F1F1C;"><div style="position:absolute;top:8%;left:10%;font-family:Anton;font-size:48px;color:#F5C518;font-weight:900;line-height:0.9;">BIG<br>SALE</div><div style="position:absolute;bottom:10%;left:10%;width:35%;height:4px;background:#F5C518;"></div></div>`,
+    quote: `<div style="position:absolute;inset:0;background:#FFFDF2;"><div style="position:absolute;top:4%;left:8%;font-size:60px;color:#F5C518;font-family:Playfair Display;font-weight:900;">"</div><div style="position:absolute;top:32%;left:10%;right:10%;font-family:Playfair Display;font-style:italic;font-size:14px;color:#1F1F1C;font-weight:700;line-height:1.1;">Design is<br>intelligence<br>made visible.</div></div>`,
+    instagram: `<div style="position:absolute;inset:0;background:#FFF;"><div style="position:absolute;top:10%;left:10%;width:80%;height:80%;background:#F5C518;border-radius:50%;"></div><div style="position:absolute;top:30%;left:30%;font-family:Bebas Neue;font-size:24px;color:#1F1F1C;text-align:center;width:40%;">NEW<br>DROP</div></div>`,
+    business: `<div style="position:absolute;inset:0;background:#FFF;"><div style="position:absolute;top:0;left:0;width:40%;height:100%;background:#1F1F1C;"></div><div style="position:absolute;top:35%;left:8%;width:25%;height:25%;background:#F5C518;border-radius:50%;"></div></div>`,
+    menu: `<div style="position:absolute;inset:0;background:#FFFDF2;"><div style="position:absolute;top:8%;left:0;right:0;text-align:center;font-family:Playfair Display;font-weight:900;font-size:18px;color:#A87E08;letter-spacing:4px;">MENU</div><div style="position:absolute;top:25%;left:20%;right:20%;height:1px;background:#A87E08;"></div><div style="position:absolute;top:35%;left:15%;right:15%;font-family:Playfair Display;font-size:8px;color:#1F1F1C;line-height:1.6;text-align:center;">STARTERS<br>Heirloom Tomato · 12<br>Beet Carpaccio · 14<br><br>MAIN<br>Wood Fired Ribeye · 38<br><br>DESSERT<br>Crème Brûlée · 11</div></div>`,
+    minimal: `<div style="position:absolute;inset:0;background:#FFF;"><div style="position:absolute;top:8%;left:8%;font-family:Inter;font-size:9px;font-weight:700;letter-spacing:3px;color:#A87E08;">EPSILON EDITS</div><div style="position:absolute;top:28%;left:8%;font-family:Inter;font-weight:800;font-size:24px;color:#1F1F1C;line-height:0.95;letter-spacing:-1px;">LESS,<br>BUT BETTER.</div><div style="position:absolute;top:75%;left:8%;width:15%;height:4px;background:#F5C518;"></div></div>`,
+    gradient: `<div style="position:absolute;inset:0;background:linear-gradient(135deg,#1F1F1C,#3D2F03);"><div style="position:absolute;top:20%;left:20%;width:60%;height:60%;background:#F5C518;border-radius:50%;opacity:0.18;"></div><div style="position:absolute;top:42%;left:0;right:0;text-align:center;font-family:Anton;font-size:34px;font-weight:900;color:#FFF;letter-spacing:-1px;">GLOW</div></div>`,
+    polaroid: `<div style="position:absolute;inset:0;background:#F4F4EE;"><div style="position:absolute;top:10%;left:18%;width:60%;height:70%;background:#FFF;transform:rotate(-3deg);box-shadow:0 4px 12px rgba(0,0,0,0.15);"></div><div style="position:absolute;top:14%;left:22%;width:52%;height:50%;background:#F5C518;transform:rotate(-3deg);"></div></div>`,
+    tutorial: `<div style="position:absolute;inset:0;background:#FFFDF2;"><div style="position:absolute;top:8%;left:8%;right:8%;bottom:8%;background:#FFF;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);"></div><div style="position:absolute;top:14%;left:14%;width:60px;height:18px;background:#F5C518;border-radius:999px;"></div><div style="position:absolute;top:28%;left:14%;font-family:Playfair Display;font-style:italic;font-weight:700;font-size:11px;color:#1F1F1C;line-height:1.1;">Use white space<br>as a design<br>element.</div></div>`,
+  };
+  return previews[t.id] || previews.blank;
+}
+
+function loadTemplate(id) {
+  const t = TEMPLATES.find(x => x.id === id);
+  if (!t) return;
+  const data = t.build();
+  state.elements = (data.elements || []).map(e => createElement(e.type, e));
+  if (data.canvas) state.canvas = Object.assign(state.canvas, data.canvas);
+  state.selectedId = null;
+  saveHistory();
+  renderAll();
+  toast(`Loaded "${t.name}" template`, 'success');
+  setStatus(`Template: ${t.name}`);
+  updateCanvasInputs();
+}
+
+/* ---------- Shapes Panel ---------- */
+const SHAPES_LIBRARY = [
+  { name: 'Rectangle', shape: 'rectangle', icon: 'square' },
+  { name: 'Circle',    shape: 'circle',    icon: 'circle' },
+  { name: 'Triangle',  shape: 'triangle', icon: 'triangle' },
+  { name: 'Star',      shape: 'star',     icon: 'star' },
+  { name: 'Polygon',   shape: 'polygon',  icon: 'pentagon' },
+  { name: 'Hexagon',   shape: 'hexagon',  icon: 'hexagon' },
+  { name: 'Heart',     shape: 'heart',    icon: 'heart' },
+  { name: 'Line',      shape: 'line',     icon: 'minus' },
+  { name: 'Arrow',     shape: 'arrow',    icon: 'arrow-right' },
+];
+
+function renderShapesPanel() {
+  let html = `<div class="section-title"><span>Basic Shapes</span></div>`;
+  html += `<div class="grid grid-cols-3 gap-2 mb-4">`;
+  SHAPES_LIBRARY.forEach(s => {
+    html += `<div class="elem-card aspect-square flex flex-col items-center justify-center gap-1 p-2" data-add-shape="${s.shape}">
+      <i data-lucide="${s.icon}" class="w-6 h-6 text-epsilon-600"></i>
+      <span class="text-[10px] text-ink-500">${s.name}</span>
+    </div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="section-title"><span>Quick Colors</span></div>`;
+  html += `<div class="flex flex-wrap gap-2 mb-4">`;
+  PALETTE.slice(0, 12).forEach(c => {
+    html += `<div class="elem-card p-2 flex items-center gap-2" data-add-color="${c}" style="flex:1;min-width:70px;">
+      <div style="width:18px;height:18px;border-radius:5px;background:${c};border:1px solid #ECECE5;"></div>
+      <span class="text-[10px] font-medium">${c}</span>
+    </div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="section-title"><span>Gradient Swatches</span></div>`;
+  const GRADIENTS = [
+    { angle: 135, stops: ['#F5C518', '#D9A90E'] },
+    { angle: 90,  stops: ['#FFDD3A', '#F5C518', '#A87E08'] },
+    { angle: 45,  stops: ['#1F1F1C', '#F5C518'] },
+    { angle: 180, stops: ['#FFFFFF', '#FFF9D9'] },
+    { angle: 135, stops: ['#F5C518', '#FF6B6B'] },
+    { angle: 90,  stops: ['#F5C518', '#1F7A4D'] },
+  ];
+  html += `<div class="grid grid-cols-3 gap-2">`;
+  GRADIENTS.forEach((g, i) => {
+    html += `<div class="gradient-swatch" data-add-gradient='${JSON.stringify(g)}' style="background:linear-gradient(${g.angle}deg, ${g.stops.join(', ')})"></div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+/* ---------- Text Panel ---------- */
+const TEXT_PRESETS = [
+  { name: 'Heading',     text: 'Heading',  fontFamily: 'Inter',  fontSize: 56, fontWeight: 800 },
+  { name: 'Subheading',  text: 'Subheading', fontFamily: 'Inter', fontSize: 28, fontWeight: 600 },
+  { name: 'Body',        text: 'Body text goes here', fontFamily: 'Inter', fontSize: 18, fontWeight: 400 },
+  { name: 'Caption',     text: 'CAPTION', fontFamily: 'Bebas Neue', fontSize: 16, fontWeight: 400, letterSpacing: 4 },
+  { name: 'Display',     text: 'DISPLAY', fontFamily: 'Anton',    fontSize: 96, fontWeight: 900, lineHeight: 0.95 },
+  { name: 'Italic Quote',text: '"Quote"', fontFamily: 'Playfair Display', fontStyle: 'italic', fontSize: 36, fontWeight: 700 },
+  { name: 'Handwritten', text: 'handwritten', fontFamily: 'Caveat', fontSize: 48, fontWeight: 700 },
+  { name: 'Brand Title', text: 'BRAND',    fontFamily: 'Oswald',  fontSize: 72, fontWeight: 700, letterSpacing: 2 },
+];
+
+function renderTextPanel() {
+  let html = `<div class="section-title"><span>Add Text</span></div>`;
+  html += `<button class="btn btn-primary w-full mb-3" data-add-text="_default"><i data-lucide="plus" class="w-4 h-4"></i> Add Text Box</button>`;
+  html += `<div class="section-title"><span>Text Presets</span></div>`;
+  html += `<div class="grid grid-cols-1 gap-2 mb-4">`;
+  TEXT_PRESETS.forEach((p, i) => {
+    const ff = `'${p.fontFamily}', sans-serif`;
+    html += `<div class="elem-card p-3" data-add-text="${i}">
+      <div style="font-family:${ff};font-size:${Math.min(p.fontSize, 24)}px;font-weight:${p.fontWeight || 400};font-style:${p.fontStyle || 'normal'};letter-spacing:${(p.letterSpacing || 0)}px;line-height:1;">${esc(p.text)}</div>
+      <div class="text-[10px] text-ink-400 mt-1 uppercase tracking-wider">${p.name}</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="section-title"><span>Font Picker</span></div>`;
+  const fonts = ['Inter','Roboto','Montserrat','Poppins','Playfair Display','DM Serif Display','Lora','Bebas Neue','Oswald','Anton','Pacifico','Lobster','Caveat','Space Grotesk'];
+  html += `<div class="space-y-1">`;
+  fonts.forEach(f => {
+    html += `<div class="font-preview" data-add-text-font="${f}" style="font-family:'${f}', sans-serif;">${f}</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+/* ---------- Icons Panel ---------- */
+const ICONS_LIBRARY = [
+  // General
+  'star', 'heart', 'bookmark', 'tag', 'gift', 'crown', 'award', 'trophy', 'medal',
+  'smile', 'thumbs-up', 'sun', 'moon', 'cloud', 'cloud-rain', 'snowflake', 'zap', 'rainbow',
+  'flame', 'sparkles', 'star-half',
+  // Arrows
+  'arrow-up', 'arrow-down', 'arrow-left', 'arrow-right',
+  'arrow-up-right', 'arrow-up-left', 'arrow-down-right', 'arrow-down-left',
+  'chevron-up', 'chevron-down', 'chevron-left', 'chevron-right',
+  'chevrons-up', 'chevrons-down', 'chevrons-left', 'chevrons-right',
+  'corner-up-right', 'corner-up-left', 'corner-down-right', 'corner-down-left',
+  'move', 'rotate-cw', 'rotate-ccw',
+  // Shapes / decorative
+  'circle', 'square', 'triangle', 'hexagon', 'octagon', 'pentagon', 'diamond',
+  'frame', 'circle-dot', 'square-dot',
+  // Nature
+  'leaf', 'flower', 'flower-2', 'trees', 'tree-pine', 'mountain', 'mountain-snow',
+  'waves', 'fish', 'bird', 'cat', 'dog', 'rabbit', 'bug', 'apple', 'cherry',
+  // Commerce
+  'shopping-bag', 'shopping-cart', 'credit-card', 'wallet', 'dollar-sign',
+  'percent', 'package', 'box', 'store', 'truck',
+  // Communication
+  'mail', 'phone', 'message-circle', 'message-square', 'send', 'share-2',
+  'at-sign', 'bell', 'megaphone',
+  // Media
+  'image', 'camera', 'video', 'film', 'music', 'music-2', 'mic', 'headphones',
+  'play', 'pause', 'skip-forward', 'skip-back', 'volume-2', 'volume-x',
+  // Tools
+  'settings', 'sliders', 'tool', 'scissors', 'pen-tool', 'brush', 'palette',
+  'paint-bucket', 'eraser', 'ruler', 'compass',
+  // People
+  'user', 'users', 'user-plus', 'user-check', 'contact',
+  // Tech
+  'smartphone', 'tablet', 'laptop', 'monitor', 'cpu', 'wifi', 'bluetooth',
+  'battery', 'battery-full', 'plug', 'power',
+  // Misc
+  'home', 'building', 'building-2', 'map-pin', 'map', 'globe', 'navigation',
+  'clock', 'calendar', 'coffee', 'pizza', 'cake', 'ice-cream', 'cookie',
+  'beer', 'wine', 'cocktail', 'cup-soda',
+  'eye', 'eye-off', 'lock', 'unlock', 'key', 'fingerprint',
+  'check', 'check-circle', 'check-square', 'x', 'x-circle', 'plus', 'minus',
+  'info', 'help-circle', 'alert-circle', 'alert-triangle',
+  'book', 'book-open', 'bookmark', 'notebook', 'file-text', 'newspaper',
+  'search', 'filter', 'sort-asc', 'sort-desc',
+  'thumbs-down', 'flag', 'pin',
+  'github', 'twitter', 'instagram', 'linkedin', 'facebook', 'youtube', 'dribbble',
+];
+
+function renderIconsPanel() {
+  let html = `<input type="text" class="input mb-3" placeholder="Search icons..." id="iconSearch" value="${esc(state._iconSearch || '')}"/>`;
+  const q = (state._iconSearch || '').toLowerCase();
+  const filtered = ICONS_LIBRARY.filter(name => !q || name.toLowerCase().includes(q));
+  if (filtered.length === 0) {
+    html += `<div class="empty-state"><i data-lucide="search-x" class="w-8 h-8 mx-auto mb-2 text-ink-200"></i>No icons found</div>`;
+  } else {
+    html += `<div class="grid grid-cols-4 gap-2">`;
+    filtered.forEach(name => {
+      html += `<div class="icon-cell" data-add-icon="${name}" title="${name}"><i data-lucide="${name}" class="w-5 h-5"></i></div>`;
+    });
+    html += `</div>`;
+    if (filtered.length > 80) {
+      html += `<div class="text-[10px] text-ink-400 mt-2 text-center">Showing ${Math.min(120, filtered.length)} of ${filtered.length} icons</div>`;
+    }
+  }
+  return html;
+}
+
+/* ---------- Images Panel ---------- */
+function renderImagesPanel() {
+  // Curated placeholder images via picsum
+  const placeholders = [
+    'https://picsum.photos/seed/eps1/400/400',
+    'https://picsum.photos/seed/eps2/400/400',
+    'https://picsum.photos/seed/eps3/400/600',
+    'https://picsum.photos/seed/eps4/600/400',
+    'https://picsum.photos/seed/eps5/400/400',
+    'https://picsum.photos/seed/eps6/400/400',
+    'https://picsum.photos/seed/eps7/400/600',
+    'https://picsum.photos/seed/eps8/600/400',
+    'https://picsum.photos/seed/eps9/400/400',
+    'https://picsum.photos/seed/eps10/400/400',
+    'https://picsum.photos/seed/eps11/400/400',
+    'https://picsum.photos/seed/eps12/400/400',
+  ];
+  let html = `<button class="btn btn-primary w-full mb-3" id="btnUploadImage"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload from Computer</button>`;
+  html += `<div class="section-title"><span>Stock Photos</span></div>`;
+  html += `<div class="grid grid-cols-2 gap-2">`;
+  placeholders.forEach(src => {
+    html += `<div class="elem-card aspect-square overflow-hidden" data-add-image="${src}">
+      <img src="${src}" class="w-full h-full object-cover" loading="lazy"/>
+    </div>`;
+  });
+  html += `</div>`;
+  html += `<div class="text-[10px] text-ink-400 mt-2">Powered by picsum.photos</div>`;
+  return html;
+}
+
+/* ---------- Footers Panel ---------- */
+const FOOTER_PRESETS = [
+  { name: 'Simple Bar',     layout: 'simple' },
+  { name: 'Three Columns',  layout: 'columns' },
+  { name: 'Brand Block',    layout: 'brand' },
+  { name: 'Social Row',     layout: 'social' },
+];
+
+function renderFootersPanel() {
+  let html = `<div class="section-title"><span>Footer Templates</span></div>`;
+  html += `<div class="space-y-2 mb-4">`;
+  FOOTER_PRESETS.forEach((f, i) => {
+    html += `<div class="footer-template" data-add-footer="${f.layout}">
+      <div style="height:40px;border-radius:6px;overflow:hidden;">
+        ${renderFooterInner(Object.assign(createElement('footer', { layout: f.layout })))}
+      </div>
+      <div class="text-[11px] text-ink-500 mt-1.5 font-medium">${f.name}</div>
+    </div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+/* ---------- Backgrounds Panel ---------- */
+function renderBackgroundsPanel() {
+  let html = `<div class="section-title"><span>Solid Background</span></div>`;
+  html += `<div class="flex flex-wrap gap-2 mb-3">`;
+  ['#FFFFFF','#FFFDF2','#FFF9D9','#FFF2A8','#FFE970','#F5C518','#FFDD3A','#D9A90E','#A87E08','#3D2F03','#1F1F1C','#0E0E0C',
+   '#F4F4EE','#ECECE5','#FF6B6B','#B83A3A','#1F7A4D','#2DD4BF','#3B82F6','#6366F1','#A855F7','#EC4899','#F97316','#84CC16'].forEach(c => {
+    html += `<div class="swatch" style="background:${c};width:28px;height:28px;" data-bg-color="${c}"></div>`;
+  });
+  html += `<div class="swatch checker" style="width:28px;height:28px;" data-bg-color="transparent" title="Transparent"></div>`;
+  html += `</div>`;
+  html += `<input type="color" id="bgCustomColor" class="color-input" style="width:100%;height:36px;" value="${state.canvas.background || '#FFFFFF'}"/>`;
+
+  html += `<div class="section-title mt-4"><span>Gradient Background</span></div>`;
+  const GRADIENTS = [
+    { angle: 135, stops: ['#FFFDF2', '#F5C518'] },
+    { angle: 90,  stops: ['#F5C518', '#D9A90E', '#A87E08'] },
+    { angle: 45,  stops: ['#FFFFFF', '#FFF9D9'] },
+    { angle: 180, stops: ['#1F1F1C', '#3D2F03', '#A87E08'] },
+    { angle: 135, stops: ['#FFDD3A', '#FF6B6B'] },
+    { angle: 90,  stops: ['#F5C518', '#1F7A4D'] },
+    { angle: 45,  stops: ['#FFFFFF', '#FFE970'] },
+    { angle: 225, stops: ['#1F1F1C', '#F5C518'] },
+  ];
+  html += `<div class="grid grid-cols-2 gap-2 mb-3">`;
+  GRADIENTS.forEach(g => {
+    html += `<div class="gradient-swatch" style="height:40px;background:linear-gradient(${g.angle}deg, ${g.stops.join(', ')})" data-bg-gradient='${JSON.stringify(g)}'></div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="section-title mt-2"><span>Background Image</span></div>`;
+  html += `<button class="btn btn-soft w-full mb-2" id="btnUploadBg"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload Image</button>`;
+  const bgImages = [
+    'https://picsum.photos/seed/bg1/800/1100',
+    'https://picsum.photos/seed/bg2/800/1100',
+    'https://picsum.photos/seed/bg3/800/1100',
+    'https://picsum.photos/seed/bg4/800/1100',
+  ];
+  html += `<div class="grid grid-cols-2 gap-2">`;
+  bgImages.forEach(src => {
+    html += `<div class="elem-card aspect-[3/4] overflow-hidden" data-bg-image="${src}">
+      <img src="${src}" class="w-full h-full object-cover" loading="lazy"/>
+    </div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+/* ---------- Uploads Panel ---------- */
+function renderUploadsPanel() {
+  let html = `<button class="btn btn-primary w-full mb-3" id="btnUploadImage2"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload Image</button>`;
+  if (state.uploads.length === 0) {
+    html += `<div class="empty-state"><i data-lucide="image-off" class="w-8 h-8 mx-auto mb-2 text-ink-200"></i><div>No uploads yet</div><div class="text-[11px] mt-1">Upload images to use them in your poster.</div></div>`;
+  } else {
+    html += `<div class="grid grid-cols-2 gap-2">`;
+    state.uploads.forEach(u => {
+      html += `<div class="elem-card aspect-square overflow-hidden" data-add-image="${u.src}">
+        <img src="${u.src}" class="w-full h-full object-cover"/>
+      </div>`;
+    });
+    html += `</div>`;
+    html += `<button class="btn btn-soft text-xs w-full mt-3" id="btnClearUploads"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear All Uploads</button>`;
+  }
+  return html;
+}
+
+/* ---------- Left panel handlers ---------- */
+function bindLeftPanelHandlers() {
+  // templates
+  $$('#leftPanelContent [data-template]').forEach(c => {
+    c.addEventListener('click', () => loadTemplate(c.dataset.template));
+  });
+  // shapes
+  $$('#leftPanelContent [data-add-shape]').forEach(c => {
+    c.addEventListener('click', () => addShapeToCenter(c.dataset.addShape));
+  });
+  $$('#leftPanelContent [data-add-color]').forEach(c => {
+    c.addEventListener('click', () => addShapeToCenter('rectangle', { fill: c.dataset.addColor, fillType: 'solid' }));
+  });
+  $$('#leftPanelContent [data-add-gradient]').forEach(c => {
+    let g;
+    try { g = JSON.parse(c.dataset.addGradient); } catch (e) { return; }
+    addShapeToCenter('rectangle', { fillType: 'gradient', gradient: g });
+  });
+  // text
+  $$('#leftPanelContent [data-add-text]').forEach(b => {
+    b.addEventListener('click', () => {
+      if (b.dataset.addText === '_default') {
+        const el = createElement('text', { text: 'Your text here' });
+        centerElementOnCanvas(el);
+        addElement(el);
+        toast('Text added', 'success', 1000);
+      } else {
+        const preset = TEXT_PRESETS[parseInt(b.dataset.addText)];
+        const el = createElement('text', preset);
+        centerElementOnCanvas(el);
+        addElement(el);
+        toast(`Added ${preset.name}`, 'success', 1000);
+      }
+    });
+  });
+  $$('#leftPanelContent [data-add-text-font]').forEach(b => {
+    b.addEventListener('click', () => {
+      const el = createElement('text', { text: b.dataset.addTextFont, fontFamily: b.dataset.addTextFont, fontSize: 48, fontWeight: 700 });
+      centerElementOnCanvas(el);
+      addElement(el);
+    });
+  });
+  // icons
+  const iconSearch = $('#iconSearch');
+  if (iconSearch) {
+    iconSearch.addEventListener('input', () => {
+      state._iconSearch = iconSearch.value;
+      renderLeftPanel();
+      const newInput = $('#iconSearch');
+      if (newInput) { newInput.focus(); newInput.setSelectionRange(newInput.value.length, newInput.value.length); }
+    });
+  }
+  $$('#leftPanelContent [data-add-icon]').forEach(c => {
+    c.addEventListener('click', () => {
+      const el = createElement('icon', { iconName: c.dataset.addIcon });
+      centerElementOnCanvas(el);
+      addElement(el);
+      toast(`Icon "${c.dataset.addIcon}" added`, 'success', 1000);
+    });
+  });
+  // images
+  $$('#leftPanelContent [data-add-image]').forEach(c => {
+    c.addEventListener('click', () => addImageFromUrl(c.dataset.addImage));
+  });
+  const btnUpload = $('#btnUploadImage') || $('#btnUploadImage2');
+  if (btnUpload) btnUpload.addEventListener('click', () => triggerImageUpload((src, name) => {
+    state.uploads.unshift({ id: uid(), name: name || 'upload', src });
+    addImageFromUrl(src);
+  }));
+  const btnClearUploads = $('#btnClearUploads');
+  if (btnClearUploads) btnClearUploads.addEventListener('click', () => {
+    if (confirm('Clear all uploaded images?')) {
+      state.uploads = [];
+      renderLeftPanel();
+    }
+  });
+  // footers
+  $$('#leftPanelContent [data-add-footer]').forEach(b => {
+    b.addEventListener('click', () => {
+      const el = createElement('footer', { layout: b.dataset.addFooter });
+      el.x = 0;
+      el.y = state.canvas.height - el.height;
+      el.width = state.canvas.width;
+      addElement(el);
+      toast('Footer added', 'success', 1000);
+    });
+  });
+  // backgrounds
+  $$('#leftPanelContent [data-bg-color]').forEach(s => {
+    s.addEventListener('click', () => {
+      const c = s.dataset.bgColor;
+      if (c === 'transparent') {
+        state.canvas.backgroundType = 'transparent';
+        state.canvas.background = 'transparent';
+      } else {
+        state.canvas.backgroundType = 'solid';
+        state.canvas.background = c;
+      }
+      saveHistory();
+      renderCanvas();
+      toast('Background updated', 'success', 1000);
+    });
+  });
+  const bgCustomColor = $('#bgCustomColor');
+  if (bgCustomColor) {
+    bgCustomColor.addEventListener('input', () => {
+      state.canvas.backgroundType = 'solid';
+      state.canvas.background = bgCustomColor.value;
+      renderCanvas();
+    });
+    bgCustomColor.addEventListener('change', () => saveHistory());
+  }
+  $$('#leftPanelContent [data-bg-gradient]').forEach(s => {
+    s.addEventListener('click', () => {
+      try {
+        const g = JSON.parse(s.dataset.bgGradient);
+        state.canvas.backgroundType = 'gradient';
+        state.canvas.gradient = g;
+        saveHistory();
+        renderCanvas();
+        toast('Gradient applied', 'success', 1000);
+      } catch (e) {}
+    });
+  });
+  $$('#leftPanelContent [data-bg-image]').forEach(s => {
+    s.addEventListener('click', () => {
+      state.canvas.backgroundType = 'image';
+      state.canvas.backgroundImage = s.dataset.bgImage;
+      saveHistory();
+      renderCanvas();
+      toast('Background image set', 'success', 1000);
+    });
+  });
+  const btnUploadBg = $('#btnUploadBg');
+  if (btnUploadBg) btnUploadBg.addEventListener('click', () => triggerImageUpload((src) => {
+    state.canvas.backgroundType = 'image';
+    state.canvas.backgroundImage = src;
+    saveHistory();
+    renderCanvas();
+  }));
+}
+
+function addShapeToCenter(shape, overrides = {}) {
+  const sz = defaultElementSize('shape');
+  const el = createElement('shape', Object.assign({
+    shape, width: sz.width, height: sz.height,
+    x: (state.canvas.width - sz.width) / 2,
+    y: (state.canvas.height - sz.height) / 2,
+  }, overrides));
+  addElement(el);
+  toast(`Added ${shape}`, 'success', 1000);
+}
+
+function addImageFromUrl(url) {
+  // get image dimensions
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    const maxW = state.canvas.width * 0.6;
+    const maxH = state.canvas.height * 0.6;
+    let w = img.naturalWidth, h = img.naturalHeight;
+    if (w > maxW) { h = h * (maxW / w); w = maxW; }
+    if (h > maxH) { w = w * (maxH / h); h = maxH; }
+    const el = createElement('image', {
+      src: url,
+      width: w, height: h,
+      x: (state.canvas.width - w) / 2,
+      y: (state.canvas.height - h) / 2,
+    });
+    addElement(el);
+    toast('Image added', 'success', 1000);
+  };
+  img.onerror = () => {
+    const el = createElement('image', {
+      src: url,
+      width: 300, height: 300,
+      x: (state.canvas.width - 300) / 2,
+      y: (state.canvas.height - 300) / 2,
+    });
+    addElement(el);
+    toast('Image added (preview may be limited)', 'default', 1800);
+  };
+  img.src = url;
+}
+
+function centerElementOnCanvas(el) {
+  el.x = (state.canvas.width - el.width) / 2;
+  el.y = (state.canvas.height - el.height) / 2;
+}
+
+function triggerImageUpload(callback) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      toast('File too large (max 8MB)', 'error', 2400);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => callback(reader.result, file.name);
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+/* ---------- Icon Picker Modal ---------- */
+function openIconPicker(onPick) {
+  showModal({
+    title: 'Pick an Icon',
+    body: `
+      <input type="text" class="input mb-3" placeholder="Search..." id="iconPickerSearch"/>
+      <div id="iconPickerGrid" class="grid grid-cols-6 gap-2 max-h-[60vh] overflow-y-auto"></div>
+    `,
+    onMount: (modal) => {
+      const grid = modal.querySelector('#iconPickerGrid');
+      const search = modal.querySelector('#iconPickerSearch');
+      function renderGrid() {
+        const q = (search.value || '').toLowerCase();
+        const filtered = ICONS_LIBRARY.filter(n => !q || n.toLowerCase().includes(q));
+        grid.innerHTML = filtered.slice(0, 120).map(n => `<div class="icon-cell" data-icon="${n}"><i data-lucide="${n}" class="w-5 h-5"></i></div>`).join('');
+        if (window.lucide) lucide.createIcons();
+        grid.querySelectorAll('[data-icon]').forEach(c => {
+          c.addEventListener('click', () => {
+            onPick(c.dataset.icon);
+            closeModal();
+            toast(`Icon: ${c.dataset.icon}`, 'success', 1000);
+          });
+        });
+      }
+      search.addEventListener('input', renderGrid);
+      renderGrid();
+    }
+  });
+}
+
+/* ---------- Modal helpers ---------- */
+function showModal({ title, body, onMount, footer }) {
+  const root = $('#modalRoot');
+  root.innerHTML = `
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-card">
+        <div class="px-5 py-4 border-b border-ink-100 flex items-center justify-between">
+          <div class="text-base font-semibold">${esc(title || '')}</div>
+          <button class="btn btn-ghost btn-icon" id="modalClose"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="p-5">${body || ''}</div>
+        ${footer ? `<div class="px-5 py-3 border-t border-ink-100 flex justify-end gap-2">${footer}</div>` : ''}
+      </div>
+    </div>
+  `;
+  if (window.lucide) lucide.createIcons();
+  const overlay = $('#modalOverlay');
+  $('#modalClose').addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  if (onMount) onMount(overlay.querySelector('.modal-card'));
+}
+function closeModal() { $('#modalRoot').innerHTML = ''; }
+
+/* ---------- Text Editing ---------- */
+function enableTextEditing(id, node) {
+  const el = getElement(id);
+  if (!el || el.type !== 'text') return;
+  // replace inner with contenteditable
+  const inner = node.querySelector('.el-text');
+  if (!inner) return;
+  inner.contentEditable = 'true';
+  inner.style.outline = '2px dashed #F5C518';
+  inner.style.cursor = 'text';
+  inner.focus();
+  // select all
+  const range = document.createRange();
+  range.selectNodeContents(inner);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  const finish = () => {
+    inner.contentEditable = 'false';
+    inner.style.outline = '';
+    inner.style.cursor = '';
+    el.text = inner.textContent || '';
+    saveHistory();
+    renderCanvas();
+    renderInspector();
+  };
+  inner.addEventListener('blur', finish, { once: true });
+  inner.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); inner.blur(); }
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); inner.blur(); }
+  });
+}
+
+/* ---------- Drag & Drop from Sidebar to Canvas ---------- */
+function setupSidebarDragDrop() {
+  // Make element cards draggable
+  document.addEventListener('mousedown', (e) => {
+    const card = e.target.closest('[data-add-shape],[data-add-text],[data-add-icon],[data-add-image],[data-add-color],[data-add-gradient],[data-add-footer],[data-add-text-font]');
+    if (!card) return;
+    if (e.button !== 0) return;
+    e.preventDefault();
+    const data = extractDragData(card);
+    if (!data) return;
+    startSidebarDrag(e, data, card);
+  });
+}
+
+function extractDragData(card) {
+  if (card.dataset.addShape) {
+    return { kind: 'shape', shape: card.dataset.addShape };
+  }
+  if (card.dataset.addColor) {
+    return { kind: 'shape', shape: 'rectangle', overrides: { fill: card.dataset.addColor, fillType: 'solid' } };
+  }
+  if (card.dataset.addGradient) {
+    let g; try { g = JSON.parse(card.dataset.addGradient); } catch (e) { return null; }
+    return { kind: 'shape', shape: 'rectangle', overrides: { fillType: 'gradient', gradient: g } };
+  }
+  if (card.dataset.addText) {
+    if (card.dataset.addText === '_default') {
+      return { kind: 'text', overrides: { text: 'Your text here' } };
+    }
+    const preset = TEXT_PRESETS[parseInt(card.dataset.addText)];
+    return { kind: 'text', overrides: preset };
+  }
+  if (card.dataset.addTextFont) {
+    return { kind: 'text', overrides: { text: card.dataset.addTextFont, fontFamily: card.dataset.addTextFont, fontSize: 48, fontWeight: 700 } };
+  }
+  if (card.dataset.addIcon) {
+    return { kind: 'icon', overrides: { iconName: card.dataset.addIcon } };
+  }
+  if (card.dataset.addImage) {
+    return { kind: 'image', overrides: { src: card.dataset.addImage } };
+  }
+  if (card.dataset.addFooter) {
+    return { kind: 'footer', overrides: { layout: card.dataset.addFooter, width: state.canvas.width, x: 0, y: state.canvas.height - 60 } };
+  }
+  return null;
+}
+
+function startSidebarDrag(e, data, card) {
+  state.isDragging = true;
+  state.dragData = data;
+  // create ghost
+  const ghost = document.createElement('div');
+  ghost.className = 'drag-ghost';
+  ghost.style.background = '#FFF';
+  ghost.style.border = '2px solid #F5C518';
+  ghost.style.borderRadius = '10px';
+  ghost.style.padding = '8px 12px';
+  ghost.style.fontWeight = '600';
+  ghost.style.fontSize = '12px';
+  ghost.style.color = '#A87E08';
+  ghost.style.left = e.clientX + 'px';
+  ghost.style.top = e.clientY + 'px';
+  ghost.textContent = '+ ' + data.kind;
+  if (data.shape) ghost.textContent += ': ' + data.shape;
+  document.body.appendChild(ghost);
+
+  const onMove = (ev) => {
+    ghost.style.left = ev.clientX + 'px';
+    ghost.style.top = ev.clientY + 'px';
+  };
+  const onUp = (ev) => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    ghost.remove();
+    state.isDragging = false;
+    // check if dropped on canvas
+    const canvas = $('#posterCanvas');
+    const rect = canvas.getBoundingClientRect();
+    const x = (ev.clientX - rect.left) / state.zoom;
+    const y = (ev.clientY - rect.top) / state.zoom;
+    if (x >= 0 && x <= state.canvas.width && y >= 0 && y <= state.canvas.height) {
+      const sz = defaultElementSize(data.kind);
+      const el = createElement(data.kind, Object.assign({
+        width: sz.width, height: sz.height,
+        x: x - sz.width / 2, y: y - sz.height / 2,
+      }, data.overrides || {}, data.shape ? { shape: data.shape } : {}));
+      addElement(el);
+      toast(`Added ${data.kind}`, 'success', 1000);
+    } else {
+      // if not dropped on canvas, add to center
+      const sz = defaultElementSize(data.kind);
+      const el = createElement(data.kind, Object.assign({
+        width: sz.width, height: sz.height,
+        x: (state.canvas.width - sz.width) / 2,
+        y: (state.canvas.height - sz.height) / 2,
+      }, data.overrides || {}, data.shape ? { shape: data.shape } : {}));
+      addElement(el);
+      toast(`Added ${data.kind} to canvas`, 'success', 1000);
+    }
+    state.dragData = null;
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+/* ---------- Canvas Mouse Handlers ---------- */
+let dragCtx = null;
+
+function setupCanvasMouseHandlers() {
+  const canvas = $('#posterCanvas');
+
+  canvas.addEventListener('mousedown', (e) => {
+    if (state.isDragging) return; // sidebar drag in progress
+    const handleEl = e.target.closest('.handle');
+    const elementEl = e.target.closest('.poster-element');
+
+    if (handleEl && elementEl) {
+      const handle = handleEl.dataset.handle;
+      const id = elementEl.dataset.id;
+      const el = getElement(id);
+      if (!el || el.locked) return;
+      startHandleDrag(e, el, handle);
+      e.preventDefault();
+      return;
+    }
+
+    if (elementEl) {
+      const id = elementEl.dataset.id;
+      const el = getElement(id);
+      if (!el) return;
+      if (state.selectedId !== id) {
+        state.selectedId = id;
+        renderAll();
+      }
+      if (el.locked) return;
+      startMoveDrag(e, el);
+      e.preventDefault();
+      return;
+    }
+
+    // clicked on empty canvas -> deselect
+    state.selectedId = null;
+    renderAll();
+  });
+
+  // cursor position display
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.round((e.clientX - rect.left) / state.zoom);
+    const y = Math.round((e.clientY - rect.top) / state.zoom);
+    $('#cursorPos').textContent = `x: ${x}  y: ${y}`;
+  });
+
+  // wheel to zoom (with ctrl)
+  $('#canvasScroll').addEventListener('wheel', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setZoom(state.zoom + delta);
+    }
+  }, { passive: false });
+}
+
+function startMoveDrag(e, el) {
+  const rect = $('#posterCanvas').getBoundingClientRect();
+  dragCtx = {
+    type: 'move',
+    id: el.id,
+    startX: e.clientX, startY: e.clientY,
+    origX: el.x, origY: el.y,
+    rect,
+  };
+  document.addEventListener('mousemove', onCanvasMouseMove);
+  document.addEventListener('mouseup', onCanvasMouseUp);
+}
+
+function startHandleDrag(e, el, handle) {
+  const rect = $('#posterCanvas').getBoundingClientRect();
+  dragCtx = {
+    type: handle === 'rot' ? 'rotate' : 'resize',
+    handle,
+    id: el.id,
+    startX: e.clientX, startY: e.clientY,
+    origX: el.x, origY: el.y,
+    origW: el.width, origH: el.height,
+    origRot: el.rotation || 0,
+    rect,
+    elCenter: getElementCenter(el, rect),
+  };
+  document.addEventListener('mousemove', onCanvasMouseMove);
+  document.addEventListener('mouseup', onCanvasMouseUp);
+}
+
+function getElementCenter(el, rect) {
+  const cx = rect.left + (el.x + el.width / 2) * state.zoom;
+  const cy = rect.top + (el.y + el.height / 2) * state.zoom;
+  return { x: cx, y: cy };
+}
+
+function onCanvasMouseMove(e) {
+  if (!dragCtx) return;
+  const el = getElement(dragCtx.id);
+  if (!el) return;
+  const dx = (e.clientX - dragCtx.startX) / state.zoom;
+  const dy = (e.clientY - dragCtx.startY) / state.zoom;
+
+  if (dragCtx.type === 'move') {
+    let nx = dragCtx.origX + dx;
+    let ny = dragCtx.origY + dy;
+    if (state.snap.enabled) {
+      const g = state.grid.size;
+      nx = Math.round(nx / g) * g;
+      ny = Math.round(ny / g) * g;
+    }
+    el.x = nx; el.y = ny;
+    // smart guides
+    if (state.smartGuides) drawSmartGuides(el);
+    renderCanvas();
+  } else if (dragCtx.type === 'resize') {
+    const h = dragCtx.handle;
+    let nx = dragCtx.origX, ny = dragCtx.origY;
+    let nw = dragCtx.origW, nh = dragCtx.origH;
+    // for handles, account for rotation by rotating the mouse delta
+    const rad = deg2rad(dragCtx.origRot);
+    const cos = Math.cos(rad), sin = Math.sin(rad);
+    // rotate delta back to element space
+    const rdx = dx * cos + dy * sin;
+    const rdy = -dx * sin + dy * cos;
+
+    if (h.includes('e')) nw = dragCtx.origW + rdx;
+    if (h.includes('w')) { nw = dragCtx.origW - rdx; nx = dragCtx.origX + rdx * cos; ny = dragCtx.origY + rdy * sin; }
+    if (h.includes('s')) nh = dragCtx.origH + rdy;
+    if (h.includes('n')) { nh = dragCtx.origH - rdy; nx = dragCtx.origX + rdx * cos; ny = dragCtx.origY + rdy * sin; }
+
+    // shift to keep aspect
+    if (e.shiftKey && (h === 'nw' || h === 'ne' || h === 'sw' || h === 'se')) {
+      const ar = dragCtx.origW / dragCtx.origH;
+      const targetW = nw;
+      const targetH = targetW / ar;
+      const dh = targetH - nh;
+      nh = targetH;
+      // adjust ny by dh in rotated space — simpler: just keep same bottom-right anchor (skip)
+    }
+
+    nw = Math.max(2, nw);
+    nh = Math.max(2, nh);
+    el.x = nx; el.y = ny; el.width = nw; el.height = nh;
+    renderCanvas();
+    // live update inspector (lightly)
+    updateInspectorLiveValues(el);
+  } else if (dragCtx.type === 'rotate') {
+    const center = dragCtx.elCenter;
+    const a1 = Math.atan2(dragCtx.startY - center.y, dragCtx.startX - center.x);
+    const a2 = Math.atan2(e.clientY - center.y, e.clientX - center.x);
+    let deg = rad2deg(a2 - a1) + dragCtx.origRot;
+    // normalize to -180..180
+    while (deg > 180) deg -= 360;
+    while (deg < -180) deg += 360;
+    if (e.shiftKey) deg = Math.round(deg / 15) * 15;
+    el.rotation = round(deg, 1);
+    renderCanvas();
+    updateInspectorLiveValues(el);
+  }
+}
+
+function onCanvasMouseUp(e) {
+  document.removeEventListener('mousemove', onCanvasMouseMove);
+  document.removeEventListener('mouseup', onCanvasMouseUp);
+  clearGuides();
+  if (dragCtx) {
+    saveHistory();
+    renderInspector();
+  }
+  dragCtx = null;
+}
+
+function updateInspectorLiveValues(el) {
+  // Update displayed values without full re-render (to keep slider focus)
+  const c = $('#inspectorContent');
+  ['x','y','width','height','rotation'].forEach(p => {
+    const inp = c.querySelector(`[data-prop="${p}"]`);
+    if (inp && inp !== document.activeElement) inp.value = round(el[p]);
+  });
+  // Update rotation label
+  const rotRange = c.querySelector('[data-prop="rotation"]');
+  if (rotRange) {
+    const label = rotRange.previousElementSibling;
+    if (label && label.tagName === 'LABEL') {
+      const span = label.querySelector('span');
+      if (span) span.textContent = round(el.rotation) + '°';
+    }
+  }
+}
+
+/* ---------- Smart Guides ---------- */
+function drawSmartGuides(movingEl) {
+  clearGuides();
+  const layer = $('#guidesLayer');
+  if (!layer) return;
+  // compute relative to canvasScroll
+  const canvas = $('#posterCanvas');
+  const canvasRect = canvas.getBoundingClientRect();
+  const scrollRect = $('#canvasScroll').getBoundingClientRect();
+  const offX = canvasRect.left - scrollRect.left;
+  const offY = canvasRect.top - scrollRect.top;
+
+  const m = {
+    left: movingEl.x, right: movingEl.x + movingEl.width,
+    top: movingEl.y, bottom: movingEl.y + movingEl.height,
+    cx: movingEl.x + movingEl.width / 2,
+    cy: movingEl.y + movingEl.height / 2,
+  };
+
+  const targets = [];
+  // canvas center lines
+  targets.push({ type: 'v', x: state.canvas.width / 2 });
+  targets.push({ type: 'h', y: state.canvas.height / 2 });
+  // canvas edges
+  targets.push({ type: 'v', x: 0 });
+  targets.push({ type: 'v', x: state.canvas.width });
+  targets.push({ type: 'h', y: 0 });
+  targets.push({ type: 'h', y: state.canvas.height });
+  // other elements
+  state.elements.forEach(o => {
+    if (o.id === movingEl.id) return;
+    targets.push({ type: 'v', x: o.x });
+    targets.push({ type: 'v', x: o.x + o.width });
+    targets.push({ type: 'v', x: o.x + o.width / 2 });
+    targets.push({ type: 'h', y: o.y });
+    targets.push({ type: 'h', y: o.y + o.height });
+    targets.push({ type: 'h', y: o.y + o.height / 2 });
+  });
+
+  const th = state.snap.threshold;
+  let snappedX = null, snappedY = null;
+  const mxCandidates = [m.left, m.right, m.cx];
+  const myCandidates = [m.top, m.bottom, m.cy];
+
+  for (const t of targets) {
+    if (t.type === 'v') {
+      for (const mx of mxCandidates) {
+        if (Math.abs(mx - t.x) < th) {
+          // snap
+          const delta = t.x - mx;
+          movingEl.x += delta;
+          snappedX = t.x;
+          // draw guide
+          const g = document.createElement('div');
+          g.className = 'guide-line v';
+          g.style.left = (offX + t.x * state.zoom) + 'px';
+          g.style.top = '0';
+          g.style.height = '100%';
+          g.style.width = '1px';
+          layer.appendChild(g);
+        }
+      }
+    } else {
+      for (const my of myCandidates) {
+        if (Math.abs(my - t.y) < th) {
+          const delta = t.y - my;
+          movingEl.y += delta;
+          snappedY = t.y;
+          const g = document.createElement('div');
+          g.className = 'guide-line h';
+          g.style.top = (offY + t.y * state.zoom) + 'px';
+          g.style.left = '0';
+          g.style.width = '100%';
+          g.style.height = '1px';
+          layer.appendChild(g);
+        }
+      }
+    }
+  }
+}
+
+function clearGuides() {
+  const layer = $('#guidesLayer');
+  if (layer) layer.innerHTML = '';
+}
+
+/* ---------- Zoom ---------- */
+function applyZoom() {
+  const canvas = $('#posterCanvas');
+  canvas.style.transform = `scale(${state.zoom})`;
+  $('#zoomLabel').textContent = Math.round(state.zoom * 100) + '%';
+}
+function setZoom(z) {
+  state.zoom = clamp(z, state.minZoom, state.maxZoom);
+  applyZoom();
+}
+function zoomIn() { setZoom(state.zoom * 1.2); }
+function zoomOut() { setZoom(state.zoom / 1.2); }
+function zoomFit() {
+  const scroll = $('#canvasScroll');
+  const cw = scroll.clientWidth - 100;
+  const ch = scroll.clientHeight - 100;
+  const z = Math.min(cw / state.canvas.width, ch / state.canvas.height);
+  setZoom(z);
+}
+
+/* ---------- Render All ---------- */
+function renderAll() {
+  renderCanvas();
+  renderInspector();
+  renderLayers();
+  if (window.lucide) lucide.createIcons();
+}
+
+/* ---------- Canvas Size ---------- */
+function updateCanvasInputs() {
+  $('#canvasW').value = state.canvas.width;
+  $('#canvasH').value = state.canvas.height;
+  const preset = `${state.canvas.width},${state.canvas.height}`;
+  const select = $('#canvasPreset');
+  let matched = false;
+  for (const opt of select.options) {
+    if (opt.value === preset) { opt.selected = true; matched = true; break; }
+  }
+  if (!matched) select.value = 'custom';
+}
+
+function applyCanvasSize() {
+  const w = parseInt($('#canvasW').value) || 800;
+  const h = parseInt($('#canvasH').value) || 1100;
+  state.canvas.width = clamp(w, 50, 10000);
+  state.canvas.height = clamp(h, 50, 10000);
+  saveHistory();
+  renderAll();
+  updateCanvasInputs();
+  toast(`Canvas: ${state.canvas.width} × ${state.canvas.height}`, 'success', 1200);
+}
+
+/* ---------- Export ---------- */
+async function exportImage(format = 'png') {
+  const canvas = $('#posterCanvas');
+  // temporarily clear selection handles
+  const prevSelected = state.selectedId;
+  state.selectedId = null;
+  renderCanvas();
+  if (window.lucide) lucide.createIcons();
+
+  // wait a tick for icons to render
+  await new Promise(r => setTimeout(r, 60));
+
+  // hide hint
+  const hint = $('#canvasHint');
+  const hintPrev = hint ? hint.style.display : '';
+  if (hint) hint.style.display = 'none';
+
+  try {
+    const scale = 2; // hi-res
+    const opts = {
+      scale,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: state.canvas.backgroundType === 'transparent' ? null : undefined,
+      width: state.canvas.width,
+      height: state.canvas.height,
+      logging: false,
+    };
+    const dataCanvas = await html2canvas(canvas, opts);
+    const link = document.createElement('a');
+    const filename = `epsilon-edits-poster-${Date.now()}.${format}`;
+    if (format === 'jpg') {
+      link.href = dataCanvas.toDataURL('image/jpeg', 0.95);
+    } else {
+      link.href = dataCanvas.toDataURL('image/png');
+    }
+    link.download = filename;
+    link.click();
+    toast(`Exported ${format.toUpperCase()}`, 'success');
+  } catch (err) {
+    console.error(err);
+    toast('Export failed (CORS issue or large image)', 'error', 3000);
+  } finally {
+    state.selectedId = prevSelected;
+    renderCanvas();
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+async function exportTransparent() {
+  // same as png but force transparent bg
+  const canvas = $('#posterCanvas');
+  const prevSelected = state.selectedId;
+  state.selectedId = null;
+  const prevBg = state.canvas.background;
+  const prevBgType = state.canvas.backgroundType;
+  state.canvas.backgroundType = 'transparent';
+  renderCanvas();
+  if (window.lucide) lucide.createIcons();
+  await new Promise(r => setTimeout(r, 60));
+  try {
+    const opts = {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      width: state.canvas.width,
+      height: state.canvas.height,
+      logging: false,
+    };
+    const dataCanvas = await html2canvas(canvas, opts);
+    const link = document.createElement('a');
+    link.href = dataCanvas.toDataURL('image/png');
+    link.download = `epsilon-edits-poster-transparent-${Date.now()}.png`;
+    link.click();
+    toast('Exported transparent PNG', 'success');
+  } catch (err) {
+    toast('Export failed', 'error');
+  } finally {
+    state.selectedId = prevSelected;
+    state.canvas.background = prevBg;
+    state.canvas.backgroundType = prevBgType;
+    renderCanvas();
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+/* ---------- Save / Load ---------- */
+function saveDesign() {
+  const data = {
+    elements: state.elements,
+    canvas: state.canvas,
+    savedAt: Date.now(),
+    version: 1,
+  };
+  const json = JSON.stringify(data);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `epsilon-edits-design-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Design saved', 'success');
+}
+
+function loadDesignFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        state.elements = data.elements || [];
+        state.canvas = Object.assign(state.canvas, data.canvas || {});
+        state.selectedId = null;
+        saveHistory();
+        renderAll();
+        updateCanvasInputs();
+        toast('Design loaded', 'success');
+      } catch (err) {
+        toast('Invalid design file', 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+/* ---------- New Poster ---------- */
+function newPoster() {
+  if (state.elements.length > 0 && !confirm('Start a new poster? Current design will be lost.')) return;
+  state.elements = [];
+  state.selectedId = null;
+  state.canvas = { width: 800, height: 1100, background: '#FFFFFF', backgroundType: 'solid', gradient: null };
+  saveHistory();
+  renderAll();
+  updateCanvasInputs();
+  toast('New poster', 'success', 1200);
+}
+
+/* ---------- Print ---------- */
+function printPoster() {
+  const canvas = $('#posterCanvas');
+  const prevSelected = state.selectedId;
+  state.selectedId = null;
+  renderCanvas();
+  if (window.lucide) lucide.createIcons();
+  setTimeout(async () => {
+    try {
+      const dataCanvas = await html2canvas(canvas, { scale: 1.5, useCORS: true, allowTaint: true, width: state.canvas.width, height: state.canvas.height });
+      const w = window.open('', '_blank');
+      w.document.write(`<html><head><title>Print - Epsilon Edits</title><style>@page{size:${state.canvas.width}px ${state.canvas.height}px;margin:0;}body{margin:0;}</style></head><body><img src="${dataCanvas.toDataURL()}" style="width:100%;"/></body></html>`);
+      w.document.close();
+      setTimeout(() => w.print(), 250);
+    } catch (e) { toast('Print failed', 'error'); }
+    state.selectedId = prevSelected;
+    renderCanvas();
+    if (window.lucide) lucide.createIcons();
+  }, 100);
+}
+
+/* ---------- Keyboard Shortcuts ---------- */
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // ignore if typing in input
+    const t = e.target;
+    const isInput = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+    const cmd = e.ctrlKey || e.metaKey;
+
+    if (isInput && !cmd) return;
+
+    // Ctrl/Cmd shortcuts
+    if (cmd) {
+      switch (e.key.toLowerCase()) {
+        case 'z':
+          e.preventDefault();
+          if (e.shiftKey) redo(); else undo();
+          return;
+        case 'y':
+          e.preventDefault();
+          redo();
+          return;
+        case 'd':
+          e.preventDefault();
+          if (state.selectedId) duplicateElement(state.selectedId);
+          return;
+        case 's':
+          e.preventDefault();
+          saveDesign();
+          return;
+        case 'e':
+          e.preventDefault();
+          exportImage('png');
+          return;
+        case 'n':
+          e.preventDefault();
+          newPoster();
+          return;
+        case '+': case '=':
+          e.preventDefault();
+          zoomIn();
+          return;
+        case '-': case '_':
+          e.preventDefault();
+          zoomOut();
+          return;
+        case '0':
+          e.preventDefault();
+          zoomFit();
+          return;
+      }
+      return;
+    }
+
+    // non-cmd
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (state.selectedId && !isInput) {
+        e.preventDefault();
+        deleteElement(state.selectedId);
+      }
+      return;
+    }
+    if (e.key === 'Escape') {
+      if (!isInput) {
+        state.selectedId = null;
+        renderAll();
+        closeModal();
+      }
+      return;
+    }
+    // arrow keys (nudge)
+    if (state.selectedId && !isInput) {
+      const el = getElement(state.selectedId);
+      if (!el) return;
+      const step = e.shiftKey ? 10 : 1;
+      let moved = false;
+      switch (e.key) {
+        case 'ArrowLeft':  el.x -= step; moved = true; break;
+        case 'ArrowRight': el.x += step; moved = true; break;
+        case 'ArrowUp':    el.y -= step; moved = true; break;
+        case 'ArrowDown':  el.y += step; moved = true; break;
+      }
+      if (moved) {
+        e.preventDefault();
+        renderCanvas();
+        updateInspectorLiveValues(el);
+        // debounced history save
+        clearTimeout(state._nudgeTimer);
+        state._nudgeTimer = setTimeout(() => saveHistory(), 400);
+      }
+    }
+  });
+}
+
+/* ---------- Menus ---------- */
+function setupMenus() {
+  const menus = [
+    { btnId: 'fileMenuBtn', menuId: 'fileMenu' },
+    { btnId: 'editMenuBtn', menuId: 'editMenu' },
+    { btnId: 'viewMenuBtn', menuId: 'viewMenu' },
+  ];
+  menus.forEach(({ btnId, menuId }) => {
+    const btn = $('#' + btnId);
+    const menu = $('#' + menuId);
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // close other menus
+      menus.forEach(m => { if (m.menuId !== menuId) $('#' + m.menuId).classList.add('hidden'); });
+      menu.classList.toggle('hidden');
+    });
+  });
+  document.addEventListener('click', () => {
+    menus.forEach(m => $('#' + m.menuId).classList.add('hidden'));
+  });
+  // menu items
+  $$('.menu [data-action]').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const action = item.dataset.action;
+      handleMenuAction(action);
+      $$('.menu').forEach(m => m.classList.add('hidden'));
+    });
+  });
+}
+
+function handleMenuAction(action) {
+  switch (action) {
+    case 'new':              newPoster(); break;
+    case 'save':             saveDesign(); break;
+    case 'load':             loadDesignFile(); break;
+    case 'export-png':        exportImage('png'); break;
+    case 'export-jpg':        exportImage('jpg'); break;
+    case 'export-transparent': exportTransparent(); break;
+    case 'print':            printPoster(); break;
+    case 'undo':             undo(); break;
+    case 'redo':             redo(); break;
+    case 'duplicate':        if (state.selectedId) duplicateElement(state.selectedId); break;
+    case 'delete':           if (state.selectedId) deleteElement(state.selectedId); break;
+    case 'bring-front':      if (state.selectedId) reorderElement(state.selectedId, 'front'); break;
+    case 'send-back':        if (state.selectedId) reorderElement(state.selectedId, 'back'); break;
+    case 'bring-forward':    if (state.selectedId) reorderElement(state.selectedId, 'forward'); break;
+    case 'send-backward':    if (state.selectedId) reorderElement(state.selectedId, 'backward'); break;
+    case 'zoom-in':          zoomIn(); break;
+    case 'zoom-out':         zoomOut(); break;
+    case 'zoom-fit':         zoomFit(); break;
+    case 'zoom-100':         setZoom(1); break;
+    case 'toggle-grid':      state.grid.show = !state.grid.show; $('#posterCanvas').classList.toggle('canvas-grid', state.grid.show); toast('Grid: ' + (state.grid.show ? 'On' : 'Off'), 'default', 1000); break;
+    case 'toggle-snap':      state.snap.enabled = !state.snap.enabled; toast('Snap: ' + (state.snap.enabled ? 'On' : 'Off'), 'default', 1000); break;
+    case 'toggle-guides':    state.smartGuides = !state.smartGuides; toast('Smart Guides: ' + (state.smartGuides ? 'On' : 'Off'), 'default', 1000); break;
+  }
+}
+
+/* ---------- Help Modal ---------- */
+function showHelpModal() {
+  const shortcuts = [
+    ['Ctrl + Z', 'Undo'],
+    ['Ctrl + Y', 'Redo'],
+    ['Ctrl + D', 'Duplicate'],
+    ['Ctrl + S', 'Save design file'],
+    ['Ctrl + E', 'Export as PNG'],
+    ['Ctrl + N', 'New poster'],
+    ['Ctrl + 0', 'Fit to screen'],
+    ['Ctrl + +/-', 'Zoom in / out'],
+    ['Delete', 'Delete selected element'],
+    ['Arrow keys', 'Nudge by 1px'],
+    ['Shift + Arrow', 'Nudge by 10px'],
+    ['Esc', 'Deselect / close modals'],
+    ['Double-click text', 'Edit text inline'],
+    ['Shift + drag', 'Keep aspect / snap to 15°'],
+  ];
+  const rows = shortcuts.map(([k, d]) => `<div class="flex items-center justify-between py-1.5 border-b border-ink-100 last:border-0"><span class="text-sm">${esc(d)}</span><span class="kbd">${esc(k)}</span></div>`).join('');
+  const tips = [
+    'Drag from the left panel onto the canvas to add elements.',
+    'Click an element to select it; drag the rotation handle on top to rotate.',
+    'Use the Inspector panel on the right to fine-tune every property.',
+    'Pick a template from the left panel to start fast.',
+    'Use Snap + Smart Guides (View menu) for precise alignment.',
+    'Your work is autosaved to localStorage every few seconds.',
+    'Export to PNG/JPG at 2× resolution for crisp results.',
+  ].map(t => `<li class="text-sm text-ink-600 mb-1.5 flex gap-2"><i data-lucide="check" class="w-4 h-4 text-epsilon-600 flex-shrink-0 mt-0.5"></i><span>${esc(t)}</span></li>`).join('');
+
+  showModal({
+    title: 'Help & Keyboard Shortcuts',
+    body: `
+      <div class="mb-4">
+        <div class="font-semibold mb-2 text-sm uppercase tracking-wider text-ink-500">Tips</div>
+        <ul>${tips}</ul>
+      </div>
+      <div>
+        <div class="font-semibold mb-2 text-sm uppercase tracking-wider text-ink-500">Keyboard Shortcuts</div>
+        <div>${rows}</div>
+      </div>
+    `
+  });
+}
+
+/* ---------- Init ---------- */
+function init() {
+  // load autosave if exists
+  const loaded = loadAutosave();
+
+  // top bar buttons
+  $('#btnExport').addEventListener('click', () => exportImage('png'));
+  $('#btnUndo').addEventListener('click', undo);
+  $('#btnRedo').addEventListener('click', redo);
+  $('#btnHelp').addEventListener('click', showHelpModal);
+  $('#btnTemplates').addEventListener('click', () => setLeftTab('templates'));
+
+  // left tabs
+  $$('.left-tab').forEach(t => {
+    t.addEventListener('click', () => setLeftTab(t.dataset.leftTab));
+  });
+  $('#closeLeftPanel').addEventListener('click', () => setLeftTab(state.currentLeftTab));
+
+  // canvas controls
+  $('#zoomInBtn').addEventListener('click', zoomIn);
+  $('#zoomOutBtn').addEventListener('click', zoomOut);
+  $('#zoomFitBtn').addEventListener('click', zoomFit);
+  $('#gridBtn').addEventListener('click', () => {
+    state.grid.show = !state.grid.show;
+    $('#posterCanvas').classList.toggle('canvas-grid', state.grid.show);
+    toast('Grid: ' + (state.grid.show ? 'On' : 'Off'), 'default', 1000);
+  });
+  $('#snapBtn').addEventListener('click', () => {
+    state.snap.enabled = !state.snap.enabled;
+    toast('Snap to Grid: ' + (state.snap.enabled ? 'On' : 'Off'), 'default', 1000);
+  });
+  $('#clearBtn').addEventListener('click', () => {
+    if (state.elements.length === 0) { toast('Canvas is already empty', 'default', 1000); return; }
+    if (confirm('Clear all elements?')) {
+      state.elements = [];
+      state.selectedId = null;
+      saveHistory();
+      renderAll();
+      toast('Canvas cleared', 'success', 1000);
+    }
+  });
+
+  // canvas size
+  $('#canvasPreset').addEventListener('change', (e) => {
+    const v = e.target.value;
+    if (v === 'custom') return;
+    const [w, h] = v.split(',').map(Number);
+    state.canvas.width = w;
+    state.canvas.height = h;
+    saveHistory();
+    renderAll();
+    updateCanvasInputs();
+    zoomFit();
+    toast(`Canvas: ${w} × ${h}`, 'success', 1200);
+  });
+  $('#applyCanvasSize').addEventListener('click', applyCanvasSize);
+  $('#canvasW').addEventListener('keydown', (e) => { if (e.key === 'Enter') applyCanvasSize(); });
+  $('#canvasH').addEventListener('keydown', (e) => { if (e.key === 'Enter') applyCanvasSize(); });
+
+  // setup interactions
+  setupSidebarDragDrop();
+  setupCanvasMouseHandlers();
+  setupKeyboardShortcuts();
+  setupMenus();
+
+  // initial render
+  setLeftTab('templates');
+  updateCanvasInputs();
+  renderAll();
+
+  // initial fit after a moment
+  setTimeout(() => { if (state.elements.length > 0 || true) zoomFit(); }, 100);
+
+  if (loaded) {
+    toast('Restored your last session', 'success', 1800);
+    setStatus('Restored from autosave');
+  } else {
+    // start with a welcome template
+    loadTemplate('event');
+    setStatus('Welcome to Epsilon Edits');
+  }
+
+  // re-render lucide periodically for dynamic content
+  if (window.lucide) lucide.createIcons();
+
+  // periodic autosave reminder
+  setInterval(() => {
+    if (state.elements.length > 0) scheduleAutosave();
+  }, 5000);
+}
+
+// wait for DOM + libraries
+window.addEventListener('load', () => {
+  if (window.lucide) lucide.createIcons();
+  if (window.html2canvas) { /* ok */ }
+  init();
+});
+</script>
+</body>
+</html>
